@@ -1,7 +1,7 @@
 *{
     margin: 0;
     padding: 0;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-family: Courier, monospace;
     box-sizing: border-box;
 }
 
@@ -14,15 +14,237 @@ section{
     width: 100%;
     height: 100vh;
     background: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-section h2{
+#glow{
     font-size: 6em;
     color: white;
     font-weight: 500;
+    text-align: center;
+    -webkit-animation: glow 1s ease-in-out infinite alternate;
+    -moz-animation: glow 1s ease-in-out infinite alternate;
+    animation: glow 1s ease-in-out infinite alternate;
+    display: block;
+    position: relative;
+    top: 40%;
+}
+
+@-webkit-keyframes glow {
+    from {
+      text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+    }
+    
+    to {
+      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
+    }
+  }
+
+#anotherGlow{
+    font-size: 1em;
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    -webkit-animation: glow 1s ease-in-out infinite alternate;
+    -moz-animation: glow 1s ease-in-out infinite alternate;
+    animation: glow 1s ease-in-out infinite alternate;
+    display: block;
+    position: relative;
+    top: 40%;
+}
+
+@-webkit-keyframes anotherGlow {
+    from {
+      text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+    }
+    
+    to {
+      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
+    }
+  }
+
+#bigBang {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    top: -20%;
+    background-color: white;
+    border-radius: 50%;
+}
+
+
+#afterBang{
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: #000;
+}
+
+#space {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+}
+
+#imgOfTheSun{
+    height: 100px;
+    position: relative;
+    top: -60%;
+    left: 45%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheSun:hover{
+    height: 600px;
+    top: -95%;
+    left: 27%;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#imgOfTheMercury{
+    height: 15px;
+    position: relative;
+    top: -60%;
+    left: 45%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheMercury:hover{
+    height: 400px;
+    top: -75%;
+    left: 14%;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#imgOfTheVenus{
+    height: 20px;
+    position: relative;
+    top: -53%;
+    left: 30%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheVenus:hover{
+    height: 400px;
+    top: -80%;
+    left: 16%;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#imgOfTheEarth{
+    height: 23px;
+    position: relative;
+    top: -45%;
+    left: 33%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheEarth:hover{
+    height: 400px;
+    top: -80%;
+    left: 21%;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#imgOfTheMars{
+    height: 17px;
+    position: relative;
+    top: -90%;
+    left: 33%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheMars:hover{
+    height: 400px;
+    top: -80%;
+    left: 3%;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#imgOfTheJupiter{
+    height: 60px;
+    position: relative;
+    top: -40%;
+    left: 45%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheJupiter:hover{
+    height: 350px;
+    top: -80%;
+    left: 17%;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#imgOfTheSaturn{
+    height: 45px;
+    position: relative;
+    top: -90%;
+    left: -4%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheSaturn:hover{
+    height: 300px;
+    top: -80%;
+    left: 1%;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#imgOfTheUranus{
+    height: 35px;
+    position: relative;
+    top: -25%;
+    left: -18%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheUranus:hover{
+    height: 500px;
+    top: -80%;
+    left: -1%;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#imgOfTheNeptune{
+    height: 32px;
+    position: relative;
+    top: -100%;
+    left: 55%;
+    z-index: 1;
+    transition: 0.3s;
+    background-color: transparent;
+} 
+
+#imgOfTheNeptune:hover{
+    height: 500px;
+    top: -80%;
+    left: -3%;
+    z-index: 100;
+    cursor: pointer;
 }
 
 .box{
@@ -39,6 +261,7 @@ section h2{
 .box .logo{
     max-width: 300px;
     max-height: 250px;
+    margin-left: calc(50% - 150px);
 }
 
 .box2{
