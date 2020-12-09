@@ -79,13 +79,13 @@ section{
     background: #000;
 }
 
-#space {
+.space {
     width: 100%;
     height: 100%;
     background-color: black;
 }
 
-#imgOfTheSun{
+.imgOfTheSun{
     height: 100px;
     position: relative;
     top: -60%;
@@ -93,17 +93,19 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheSun:hover{
+.imgOfTheSunClicked{
     height: 600px;
     top: -95%;
     left: 27%;
     z-index: 100;
     cursor: pointer;
+    transition: 0.3s;
 }
 
-#imgOfTheMercury{
+.imgOfTheMercury{
     height: 15px;
     position: relative;
     top: -60%;
@@ -111,17 +113,20 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheMercury:hover{
+.imgOfTheMercuryClicked{
     height: 400px;
     top: -75%;
     left: 14%;
     z-index: 100;
     cursor: pointer;
+    transition: 0.3s;
+    cursor: pointer;
 }
 
-#imgOfTheVenus{
+.imgOfTheVenus{
     height: 20px;
     position: relative;
     top: -53%;
@@ -129,17 +134,20 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheVenus:hover{
+.imgOfTheVenusClicked{
     height: 400px;
     top: -80%;
     left: 16%;
     z-index: 100;
     cursor: pointer;
+    transition: 0.3s;
+    cursor: pointer;
 }
 
-#imgOfTheEarth{
+.imgOfTheEarth{
     height: 23px;
     position: relative;
     top: -45%;
@@ -147,17 +155,20 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheEarth:hover{
+.imgOfTheEarthClicked{
     height: 400px;
     top: -80%;
     left: 21%;
     z-index: 100;
     cursor: pointer;
+    transition: 0.3s;
+    cursor: pointer;
 }
 
-#imgOfTheMars{
+.imgOfTheMars{
     height: 17px;
     position: relative;
     top: -90%;
@@ -165,17 +176,20 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheMars:hover{
+.imgOfTheMarsClicked{
     height: 400px;
     top: -80%;
     left: 3%;
     z-index: 100;
     cursor: pointer;
+    transition: 0.3s;
+    cursor: pointer;
 }
 
-#imgOfTheJupiter{
+.imgOfTheJupiter{
     height: 60px;
     position: relative;
     top: -40%;
@@ -183,17 +197,20 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheJupiter:hover{
+.imgOfTheJupiterClicked{
     height: 350px;
     top: -80%;
     left: 17%;
     z-index: 100;
     cursor: pointer;
+    transition: 0.3s;
+    cursor: pointer;
 }
 
-#imgOfTheSaturn{
+.imgOfTheSaturn{
     height: 45px;
     position: relative;
     top: -90%;
@@ -201,17 +218,20 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheSaturn:hover{
+.imgOfTheSaturnClicked{
     height: 300px;
     top: -80%;
     left: 1%;
     z-index: 100;
     cursor: pointer;
+    transition: 0.3s;
+    cursor: pointer;
 }
 
-#imgOfTheUranus{
+.imgOfTheUranus{
     height: 35px;
     position: relative;
     top: -25%;
@@ -219,17 +239,20 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheUranus:hover{
+.imgOfTheUranusClicked{
     height: 500px;
     top: -80%;
     left: -1%;
     z-index: 100;
     cursor: pointer;
+    transition: 0.3s;
+    cursor: pointer;
 }
 
-#imgOfTheNeptune{
+.imgOfTheNeptune{
     height: 32px;
     position: relative;
     top: -100%;
@@ -237,13 +260,16 @@ section{
     z-index: 1;
     transition: 0.3s;
     background-color: transparent;
+    cursor: pointer;
 } 
 
-#imgOfTheNeptune:hover{
+.imgOfTheNeptuneClicked{
     height: 500px;
     top: -80%;
     left: -3%;
     z-index: 100;
+    cursor: pointer;
+    transition: 0.3s;
     cursor: pointer;
 }
 

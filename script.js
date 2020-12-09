@@ -54,112 +54,112 @@ gsap.timeline({
 })
 
 .from("#afterBang", {opacity : 0})
-.from("#space", {
+.from(".space", {
     opacity : 0, 
 })
 
-.from("#imgOfTheSun", {
+.from(".imgOfTheSun", {
     opacity : 0, 
     scaleY : 14,
     scaleX : 14,
 })
-.to("#imgOfTheSun", {
+.to(".imgOfTheSun", {
     scaleY : 1,
     scaleX : 1
 })
 
-.from("#imgOfTheMercury", {
+.from(".imgOfTheMercury", {
     opacity : 0, 
     scaleY : 54,
     scaleX : 54,
     x : innerWidth * 1,
     y : innerHeight * 1
 })
-.to("#imgOfTheSun", {
+.to(".imgOfTheSun", {
     scaleY : 1,
     scaleX : 1
 })
 
-.from("#imgOfTheVenus", {
+.from(".imgOfTheVenus", {
     opacity : 0, 
     scaleY : 24,
     scaleX : 24,
     x : innerWidth * -1,
     y : innerHeight * -1
 })
-.to("#imgOfTheVenus", {
+.to(".imgOfTheVenus", {
     scaleY : 1,
     scaleX : 1
 })
 
-.from("#imgOfTheEarth", {
+.from(".imgOfTheEarth", {
     opacity : 0, 
     scaleY : 20,
     scaleX : 20,
     x : innerWidth * 1,
     y : innerHeight * -1
 })
-.to("#imgOfTheEarth", {
+.to(".imgOfTheEarth", {
     scaleY : 1,
     scaleX : 1
 })
 
-.from("#imgOfTheMars", {
+.from(".imgOfTheMars", {
     opacity : 0, 
     scaleY : 50,
     scaleX : 50,
     x : innerWidth * -1,
     y : innerHeight * 1
 })
-.to("#imgOfTheMars", {
+.to(".imgOfTheMars", {
     scaleY : 1,
     scaleX : 1
 })
 
-.from("#imgOfTheJupiter", {
+.from(".imgOfTheJupiter", {
     opacity : 0, 
     scaleY : 13,
     scaleX : 13,
     x : innerWidth * 0.3,
     y : innerHeight * -0.5
 })
-.to("#imgOfTheJupiter", {
+.to(".imgOfTheJupiter", {
     scaleY : 1,
     scaleX : 1
 })
 
-.from("#imgOfTheSaturn", {
+.from(".imgOfTheSaturn", {
     opacity : 0, 
     scaleY : 17,
     scaleX : 17,
     x : innerWidth * -0.8,
     y : innerHeight * 0.1
 })
-.to("#imgOfTheSaturn", {
+.to(".imgOfTheSaturn", {
     scaleY : 1,
     scaleX : 1
 })
 
-.from("#imgOfTheUranus", {
+.from(".imgOfTheUranus", {
     opacity : 0, 
     scaleY : 27,
     scaleX : 27,
     x : innerWidth * 0.5,
     y : innerHeight * -1
 })
-.to("#imgOfTheUranus", {
+.to(".imgOfTheUranus", {
     scaleY : 1,
     scaleX : 1
 })
 
-.from("#imgOfTheNeptune", {
+.from(".imgOfTheNeptune", {
     opacity : 0, 
     scaleY : 30,
     scaleX : 30,
     x : innerWidth * -1,
     y : innerHeight * 0.5
 })
-.to("#imgOfTheNeptune", {
+.to(".imgOfTheNeptune", {
     scaleY : 1,
     scaleX : 1
 });
@@ -200,4 +200,63 @@ gsap.timeline({
  .from(".text4", {y : innerHeight * 1})
  .from(".text5", {y : innerHeight * -1})
  .from(".text6", {y : innerHeight * 1})
+
+ 
+ const sun = document.querySelector(".imgOfTheSun"),
+    mercury = document.querySelector(".imgOfTheMercury"),
+    venus = document.querySelector(".imgOfTheVenus"),
+    earth = document.querySelector(".imgOfTheEarth"),
+    mars = document.querySelector(".imgOfTheMars"),
+    jupiter = document.querySelector(".imgOfTheJupiter"),
+    saturn = document.querySelector(".imgOfTheSaturn"),
+    uranus = document.querySelector(".imgOfTheUranus"),
+    neptune = document.querySelector(".imgOfTheNeptune");
+
+function toggleSun() {
+    sun.classList.toggle("imgOfTheSunClicked");
+    }
+
+function toggleMercury() {
+    mercury.classList.toggle("imgOfTheMercuryClicked");
+    }
+
+function toggleVenus() {
+    venus.classList.toggle("imgOfTheVenusClicked");
+    }
+
+function toggleEarth() {
+    earth.classList.toggle("imgOfTheEarthClicked");
+    }
+
+function toggleMars() {
+    mars.classList.toggle("imgOfTheMarsClicked");
+    }
+
+function toggleJupiter() {
+    jupiter.classList.toggle("imgOfTheJupiterClicked");
+    }
+
+function toggleSaturn() {
+    saturn.classList.toggle("imgOfTheSaturnClicked");
+    }
+
+function toggleUranus() {
+    uranus.classList.toggle("imgOfTheUranusClicked");
+    }
+
+function toggleNeptune() {
+    neptune.classList.toggle("imgOfTheNeptuneClicked");
+    }
+
+ sun.addEventListener('click', toggleSun);
+ mercury.addEventListener('click', toggleMercury);
+ venus.addEventListener('click', toggleVenus);
+ earth.addEventListener('click', toggleEarth);
+ mars.addEventListener('click', toggleMars);
+ jupiter.addEventListener('click', toggleJupiter);
+ saturn.addEventListener('click', toggleSaturn);
+ uranus.addEventListener('click', toggleUranus);
+ neptune.addEventListener('click', toggleNeptune);
+
+
 
