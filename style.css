@@ -16,7 +16,7 @@ section{
     background: #000;
 }
 
-#glow{
+#myGlow{
     font-size: 6em;
     color: white;
     font-weight: 500;
@@ -273,21 +273,106 @@ section{
     cursor: pointer;
 }
 
+.clickToZoom{
+    font-size: 2em;
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    -webkit-animation: glow 1s ease-in-out infinite alternate;
+    -moz-animation: glow 1s ease-in-out infinite alternate;
+    animation: glow 1s ease-in-out infinite alternate;
+    display: block;
+    position: relative;
+    top: -115%;
+}
+
 .box{
+    margin-top: 3em;
     position: relative;
     width: 100%;
     min-height: 100vh;
     padding: 100px;
+    background-image: url("images/universe/closeEarth.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
 }
 
 .box h2{
     font-size: 3em;
 }
 
-.box .logo{
-    max-width: 300px;
-    max-height: 250px;
-    margin-left: calc(50% - 150px);
+.box h1{
+    font-size: 3em;
+}
+
+#text1, #text2, #text3, #text4, #text5{
+    padding-top: 0.1em;
+    font-weight: 500;
+    color: #000;
+    text-align: center;
+    -webkit-animation: glow 1s ease-in-out infinite alternate;
+    -moz-animation: glow 1s ease-in-out infinite alternate;
+    animation: glow 1s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow {
+    from {
+      text-shadow: 0 0 10px #000, 0 0 20px rgb(99, 99, 99);
+    }
+    
+    to {
+      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
+    }
+  }
+  
+  #myDocs{
+    padding: 2em 0 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #firstRect{
+    height: 200px;
+    width: 300px;
+    border: 3px dashed rgb(53, 53, 53);
+    border-radius: 10%;
+    margin-right: 50px;
+    transition: 0.3s;
+    background: #fff;
+  }
+
+  #firstRect:hover{
+    background-color:rgb(201, 171, 133);
+    border: 3px solid black;
+  }
+
+  #firstRect img{
+      margin-top: 15px;
+      width: 150px;
+      height: 150px;
+  }
+
+  #secondRect{
+    height: 200px;
+    width: 300px;
+    border: 3px dashed rgb(53, 53, 53);
+    border-radius: 10%;
+    margin-left: 50px;
+    transition: 0.3s;
+    background: #fff;
+}
+
+#secondRect:hover{
+    background-color:rgb(201, 171, 133);
+    border: 3px solid black;
+  }
+
+#secondRect img{
+    margin-top: 15px;
+    width: 150px;
+    height: 150px;
 }
 
 .box2{
@@ -296,9 +381,14 @@ section{
     min-height: 100vh;
     padding: 100px;
     background: #000;
+    text-align: center;
 }
 
 .box2 h2{
     font-size: 3em;
     color: #fff;
 }
+
+
+
+
