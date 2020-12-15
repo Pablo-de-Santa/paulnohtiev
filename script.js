@@ -37,8 +37,8 @@ gsap.timeline({
     opacity : 1
 })
 .to("#bigBang", {
-    scaleY : 5.5,
-    scaleX : 5.5,
+    scaleY : 3,
+    scaleX : 3,
     opacity : 0
 });
 
