@@ -6,7 +6,7 @@ gsap.timeline({
     scrollTrigger:{
         trigger:"#top",
         start:"center center",
-        end:"bottom -300%",
+        end:"bottom -200%",
         markers: false,
         scrub : true,
         pin : true
@@ -37,9 +37,9 @@ gsap.timeline({
     opacity : 1
 })
 .to("#bigBang", {
-    scaleY : 1.5,
-    scaleX : 1.5,
-    opacity : 1,
+    scaleY : 5.5,
+    scaleX : 5.5,
+    opacity : 0
 });
 
 gsap.timeline({

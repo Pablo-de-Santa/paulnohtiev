@@ -7,6 +7,7 @@
 
 body{
     overflow-x: hidden;
+    background: #000;
 }
 
 section{
@@ -292,7 +293,9 @@ section{
     width: 100%;
     min-height: 100vh;
     padding: 100px;
-    background-image: url("images/universe/closeEarth.jpg");
+    background-image: url("images/universe/closeEarth.JPG");
+    background-attachment: fixed;
+    background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     text-align: center;
