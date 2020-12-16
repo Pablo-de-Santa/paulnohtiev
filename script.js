@@ -870,3 +870,39 @@ let VanillaTilt = (function () {
     .from(".text8", {
         y : innerHeight * 1
        });
+
+       gsap.timeline({
+        scrollTrigger:{
+            trigger:".planeSection",
+            start:"center center",
+            end:"bottom -100",
+            markers: false,
+            scrub : true,
+            pin : true
+        }
+    })
+   
+    .from(".planeSection", {
+        opacity : 0
+       })
+    .from("#firstCloud", {
+        scale : 3
+       })
+    .from("#secondCloud", {
+        scale : 3
+       })
+
+       .from("#thePlane", {
+        x : innerWidth * 1,
+        y : innerHeight * -1,
+        scale : 0
+       })
+       
+       .to("#thePlane", {
+        x : innerWidth * -1,
+        y : innerHeight * 0.5,
+        scale : 2
+       });
+    // .to(".planeSection", {
+    //     opacity : 0
+    //    });
