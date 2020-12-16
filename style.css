@@ -386,8 +386,11 @@ section{
     position: relative;
     width: 100%;
     min-height: 100vh;
-    padding: 100px;
     background: #000;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     text-align: center;
 }
 
@@ -396,6 +399,74 @@ section{
     color: #fff;
 }
 
+#textAroundStars{
+    padding-top: 15em;
+    position: relative;
+    top: 25%;
+}
 
+#textAroundStars{
+    font-weight: 500;
+    color: #fff;
+    text-align: center;
+    -webkit-animation: glow 1s ease-in-out infinite alternate;
+    -moz-animation: glow 1s ease-in-out infinite alternate;
+    animation: glow 1s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow {
+    from {
+      text-shadow: 0 0 10px #000, 0 0 20px rgb(99, 99, 99);
+    }
+    
+    to {
+      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
+    }
+  }
+
+/* Stars */
+
+.canvas {
+    width: 100%;
+    height: 100%;
+    clear: both;
+    overflow: hidden;
+    position: relative;
+    bottom: 35%;
+    z-index: -1;
+  }
+  
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    -webkit-box-shadow: 0 0 5px rgba(255, 255, 255, 0.75);
+    -moz-box-shadow: 0 0 5px rgba(255, 255, 255, 0.75);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.75);
+  }
+  
+  .streak {
+    background: #fff;
+    border-radius: 100%;
+    width: 10px;
+    height: 250px;
+    position: relative;
+    top: 100px;
+    left: 100px;
+    -webkit-box-shadow: 0 0 25px rgba(255, 255, 255, 0.75);
+    -moz-box-shadow: 0 0 25px rgba(255, 255, 255, 0.75);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.75);
+    -moz-transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    -o-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    transform: rotate(-135deg);
+    background: -moz-linear-gradient(top, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(25%, white), color-stop(100%, rgba(255, 255, 255, 0)));
+    background: -webkit-linear-gradient(top, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
+    background: -o-linear-gradient(top, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
+    background: -ms-linear-gradient(top, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to bottom, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
+  }
 
 

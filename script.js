@@ -225,31 +225,6 @@ gsap.timeline({
      });
 
 
-
-//  gsap.timeline({
-//      scrollTrigger:{
-//          trigger:".box2",
-//          start:"center center",
-//          end:"bottom -100",
-//          markers: false,
-//          scrub : true,
-//          pin : true
-//      }
-//  })
-
-//  .from(".box2", {
-//      opacity : 0
-//     })
-//  .from(".text6", {
-//      y : innerHeight * 1
-//     })
-//  .from(".text7", {
-//      y : innerHeight * -1
-//     })
-//  .from(".text8", {
-//      y : innerHeight * 1
-//     });
-
  const sun = document.querySelector(".imgOfTheSun"),
     mercury = document.querySelector(".imgOfTheMercury"),
     venus = document.querySelector(".imgOfTheVenus"),
@@ -816,3 +791,82 @@ let VanillaTilt = (function () {
         max: 12,
         speed: 400
     });
+
+    // Stars
+
+    $( function() {
+
+        console.log( 'loaded' );
+      
+        let $canvas = $( '.canvas' ),
+            canvasWidth = $canvas.outerWidth(),
+            canvasHeight = $canvas.outerHeight();
+      
+        starField();
+      
+      
+        function starField() {
+          const maxStars = 1000;
+          for( let i = 0; i < maxStars; i++ ) {
+            let elem = document.createElement( "div" );
+            let size = Math.floor( Math.random() * 8 + 1 );
+            $( elem ).addClass( 'star' );
+            $( elem ).css( {
+              left   : Math.floor( Math.random() * canvasWidth ),
+              top    : Math.floor( Math.random() * canvasHeight ),
+              opacity: Math.random(),
+              width  : size,
+              height : size
+            } );
+      
+            $canvas.append( elem );
+          }
+          var $star = $( '.star' );
+          var stl = new TimelineMax( {yoyo: true} );
+          stl.add( TweenMax.staggerTo( $star.slice( 1, (maxStars / 10) ), 0.5, {
+            autoAlpha  : 0.25,
+            scale      : 0.25,
+            yoyo       : true,
+            repeat     : -1,
+            repeatDelay: 1,
+            ease       : Bounce.easeOut
+          }, 0.05 ) );
+        }
+      
+        var $streak = $( '.streak' );
+      
+        function shootingStar() {
+            var tl = new TimelineMax( { delay: Math.random() * 3 } ),
+              scale = (Math.random() * 3 + 0.5);
+          tl.set( $streak, { left: Math.random() * canvasWidth, top: 0, scale: 0 } )
+              .to( $streak, scale, { left: '-=250', top: '+=550', scale: scale, autoAlpha: 1, ease: SlowMo.easeOut } )
+              .to( $streak, scale, { left: '-=250', top: '+=550', scale: 0, autoAlpha: 0, ease: SlowMo.easeOut, onComplete: shootingStar }, '-=.8' );
+        }
+      
+        shootingStar();
+      
+      } );
+
+      gsap.timeline({
+        scrollTrigger:{
+            trigger:".box2",
+            start:"center center",
+            end:"bottom -100",
+            markers: false,
+            scrub : true,
+            pin : true
+        }
+    })
+   
+    .from(".box2", {
+        opacity : 0
+       })
+    .from(".text6", {
+        y : innerHeight * 1
+       })
+    .from(".text7", {
+        y : innerHeight * -1
+       })
+    .from(".text8", {
+        y : innerHeight * 1
+       });
