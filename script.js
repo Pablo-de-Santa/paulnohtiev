@@ -902,7 +902,78 @@ let VanillaTilt = (function () {
         x : innerWidth * -1,
         y : innerHeight * 0.5,
         scale : 2
+       })
+       
+       .from("#boeing747", {
+        x : innerWidth * 1
+       })
+       
+       .to("#boeing747", {
+        x : innerWidth * -1.5
+       })
+       
+       .from("#f22", {
+        y : innerHeight * 1
+       })
+       
+       .to("#f22", {
+        y : innerHeight * -2.0
+       })
+       
+       .from("#mria", {
+        x : innerWidth * -0,
+        y : innerHeight * -0.8,
+        scale : 0
+       })
+       
+       .to("#mria", {
+        x : innerWidth * 0,
+        y : innerHeight * 0.8,
+        scale : 3
+       })
+        .to(".planeSection", {
+        opacity : 0
        });
-    // .to(".planeSection", {
-    //     opacity : 0
-    //    });
+
+       gsap.timeline({
+        scrollTrigger:{
+            trigger:"#textAfterTheSky",
+            start:"center center",
+            end:"bottom -100",
+            markers: false,
+            scrub : true,
+            pin : true
+        }
+    })
+   
+    .from("#textAfterTheSky", {
+        opacity : 0
+       })
+    .from(".text9", {
+        y : innerHeight * 1
+       })
+    .from(".text10", {
+        y : innerHeight * 1
+       })
+    .from(".text11", {
+        y : innerHeight * 1
+       })
+    .from(".text12", {
+        y : innerHeight * 1
+       })
+    .from(".text13", {
+        y : innerHeight * 1
+       })
+    .from(".text14", {
+        y : innerHeight * 1
+       })
+    .from(".text15", {
+        y : innerHeight * 1
+       })
+
+    .from(".container1", {
+        scale : 0
+       })
+    .from(".container2", {
+        scale : 0
+       });
