@@ -1,5 +1,415 @@
 "use strict";
 
+gsap.registerPlugin(ScrollTrigger); 
+
+gsap.timeline({
+    scrollTrigger:{
+        trigger:"#top",
+        start:"center center",
+        end:"bottom -200%",
+        markers: false,
+        scrub : true,
+        pin : true
+    }
+})
+
+.from("#myGlow", {
+    scaleY : 1,
+    scaleX : 1
+})
+.to("#myGlow", {
+    scaleY : 0,
+    scaleX : 0
+})
+
+.from("#anotherGlow", {
+    scaleY : 1,
+    scaleX : 1
+})
+.to("#anotherGlow", {
+    scaleY : 0,
+    scaleX : 0
+})
+
+.from("#bigBang", {
+    scaleY : 0,
+    scaleX : 0,
+    opacity : 1
+})
+.to("#bigBang", {
+    scaleY : 3,
+    scaleX : 3,
+    opacity : 0
+});
+
+gsap.timeline({
+    scrollTrigger:{
+        trigger:"#afterBang",
+        start:"center center",
+        end:"bottom -1000%",
+        markers: false,
+        scrub : true,
+        pin : true,
+    }
+})
+
+.from("#afterBang", {opacity : 0})
+.from(".space", {
+    opacity : 0, 
+})
+
+.from(".imgOfTheSun", {
+    opacity : 0, 
+    scaleY : 14,
+    scaleX : 14,
+})
+.to(".imgOfTheSun", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".imgOfTheMercury", {
+    opacity : 0, 
+    scaleY : 54,
+    scaleX : 54,
+    x : innerWidth * 1,
+    y : innerHeight * 1
+})
+.to(".imgOfTheSun", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".imgOfTheVenus", {
+    opacity : 0, 
+    scaleY : 24,
+    scaleX : 24,
+    x : innerWidth * -1,
+    y : innerHeight * -1
+})
+.to(".imgOfTheVenus", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".imgOfTheEarth", {
+    opacity : 0, 
+    scaleY : 20,
+    scaleX : 20,
+    x : innerWidth * 1,
+    y : innerHeight * -1
+})
+.to(".imgOfTheEarth", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".imgOfTheMars", {
+    opacity : 0, 
+    scaleY : 50,
+    scaleX : 50,
+    x : innerWidth * -1,
+    y : innerHeight * 1
+})
+.to(".imgOfTheMars", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".imgOfTheJupiter", {
+    opacity : 0, 
+    scaleY : 13,
+    scaleX : 13,
+    x : innerWidth * 0.3,
+    y : innerHeight * -0.5
+})
+.to(".imgOfTheJupiter", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".imgOfTheSaturn", {
+    opacity : 0, 
+    scaleY : 17,
+    scaleX : 17,
+    x : innerWidth * -0.8,
+    y : innerHeight * 0.1
+})
+.to(".imgOfTheSaturn", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".imgOfTheUranus", {
+    opacity : 0, 
+    scaleY : 27,
+    scaleX : 27,
+    x : innerWidth * 0.5,
+    y : innerHeight * -1
+})
+.to(".imgOfTheUranus", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".imgOfTheNeptune", {
+    opacity : 0, 
+    scaleY : 30,
+    scaleX : 30,
+    x : innerWidth * -1,
+    y : innerHeight * 0.5
+})
+.to(".imgOfTheNeptune", {
+    scaleY : 1,
+    scaleX : 1
+})
+
+.from(".clickToZoom", {
+    opacity : 0, 
+    scaleY : 0,
+    scaleX : 0
+})
+.to(".clickToZoom", {
+    scaleY : 1,
+    scaleX : 1
+});
+
+gsap.timeline({
+     scrollTrigger:{
+         trigger:".box",
+         start:"center center",
+         end:"bottom -100",
+         markers: false,
+         scrub : true,
+         pin : true
+     }
+ })
+
+ .from("#text1", {
+    y : innerHeight * 1
+    })
+ .from("#text2", {
+     x : innerWidth * -1
+    })
+ .from("#text3", {
+     x : innerWidth * 1
+    })
+ .from("#text4", {
+     x : innerWidth * -1,
+     y : innerHeight * -1
+    })
+ .from("#text5", {
+     x : innerWidth * 1,
+     y : innerHeight * 1
+    })
+
+ .from("#firstRect", {
+     scaleY: 1,
+     scaleX: 0
+     })
+     
+ .to("#firstRect", {
+     scaleY: 1,
+     scaleX: 1
+    })
+
+ .from("#secondRect", {
+     scaleY: 0,
+     scaleX: 1
+    })
+        
+ .to("#secondRect", {
+     scaleY: 1,
+     scaleX: 1
+     });
+
+      gsap.timeline({
+        scrollTrigger:{
+            trigger:".box2",
+            start:"center center",
+            end:"bottom -100",
+            markers: false,
+            scrub : true,
+            pin : true
+        }
+    })
+   
+    .from(".box2", {
+        opacity : 0
+       })
+    .from(".text6", {
+        y : innerHeight * 1
+       })
+    .from(".text7", {
+        y : innerHeight * -1
+       })
+    .from(".text8", {
+        y : innerHeight * 1
+       });
+
+       gsap.timeline({
+        scrollTrigger:{
+            trigger:".planeSection",
+            start:"center center",
+            end:"bottom -100",
+            markers: false,
+            scrub : true,
+            pin : true
+        }
+    })
+   
+    .from(".planeSection", {
+        opacity : 0
+       })
+    .from("#firstCloud", {
+        scale : 3
+       })
+    .from("#secondCloud", {
+        scale : 3
+       })
+
+       .from("#thePlane", {
+        x : innerWidth * 1,
+        y : innerHeight * -1,
+        scale : 0
+       })
+       
+       .to("#thePlane", {
+        x : innerWidth * -1,
+        y : innerHeight * 0.5,
+        scale : 2
+       })
+       
+       .from("#boeing747", {
+        x : innerWidth * 1
+       })
+       
+       .to("#boeing747", {
+        x : innerWidth * -1.5
+       })
+       
+       .from("#f22", {
+        y : innerHeight * 1
+       })
+       
+       .to("#f22", {
+        y : innerHeight * -2.0
+       })
+       
+       .from("#mria", {
+        x : innerWidth * -0,
+        y : innerHeight * -0.8,
+        scale : 0
+       })
+       
+       .to("#mria", {
+        x : innerWidth * 0,
+        y : innerHeight * 0.8,
+        scale : 3
+       })
+        .to(".planeSection", {
+        opacity : 0
+       });
+
+       gsap.timeline({
+        scrollTrigger:{
+            trigger:"#textAfterTheSky",
+            start:"center center",
+            end:"bottom -100",
+            markers: false,
+            scrub : true,
+            pin : true
+        }
+    })
+   
+    .from("#textAfterTheSky", {
+        opacity : 0
+       })
+    .from(".text9", {
+        y : innerHeight * 1
+       })
+    .from(".text10", {
+        y : innerHeight * 1
+       })
+    .from(".text11", {
+        y : innerHeight * 1
+       })
+    .from(".text12", {
+        y : innerHeight * 1
+       })
+    .from(".text13", {
+        y : innerHeight * 1
+       })
+    .from(".text14", {
+        y : innerHeight * 1
+       })
+    .from(".text15", {
+        y : innerHeight * 1
+       })
+
+    .from(".container1", {
+        scale : 0
+       })
+    .from(".container2", {
+        scale : 0
+       });
+
+       const sun = document.querySelector(".imgOfTheSun"),
+    mercury = document.querySelector(".imgOfTheMercury"),
+    venus = document.querySelector(".imgOfTheVenus"),
+    earth = document.querySelector(".imgOfTheEarth"),
+    mars = document.querySelector(".imgOfTheMars"),
+    jupiter = document.querySelector(".imgOfTheJupiter"),
+    saturn = document.querySelector(".imgOfTheSaturn"),
+    uranus = document.querySelector(".imgOfTheUranus"),
+    neptune = document.querySelector(".imgOfTheNeptune");
+
+function toggleSun() {
+    sun.classList.toggle("imgOfTheSunClicked");
+    }
+
+function toggleMercury() {
+    mercury.classList.toggle("imgOfTheMercuryClicked");
+    }
+
+function toggleVenus() {
+    venus.classList.toggle("imgOfTheVenusClicked");
+    }
+
+function toggleEarth() {
+    earth.classList.toggle("imgOfTheEarthClicked");
+    }
+
+function toggleMars() {
+    mars.classList.toggle("imgOfTheMarsClicked");
+    }
+
+function toggleJupiter() {
+    jupiter.classList.toggle("imgOfTheJupiterClicked");
+    }
+
+function toggleSaturn() {
+    saturn.classList.toggle("imgOfTheSaturnClicked");
+    }
+
+function toggleUranus() {
+    uranus.classList.toggle("imgOfTheUranusClicked");
+    }
+
+function toggleNeptune() {
+    neptune.classList.toggle("imgOfTheNeptuneClicked");
+    }
+
+ sun.addEventListener('click', toggleSun);
+ mercury.addEventListener('click', toggleMercury);
+ venus.addEventListener('click', toggleVenus);
+ earth.addEventListener('click', toggleEarth);
+ mars.addEventListener('click', toggleMars);
+ jupiter.addEventListener('click', toggleJupiter);
+ saturn.addEventListener('click', toggleSaturn);
+ uranus.addEventListener('click', toggleUranus);
+ neptune.addEventListener('click', toggleNeptune);
+
 // TILT //
 
 let VanillaTilt = (function () {
@@ -567,414 +977,3 @@ let VanillaTilt = (function () {
   } );
 
 
-gsap.registerPlugin(ScrollTrigger); 
-
-gsap.timeline({
-    scrollTrigger:{
-        trigger:"#top",
-        start:"center center",
-        end:"bottom -200%",
-        markers: false,
-        scrub : true,
-        pin : true
-    }
-})
-
-.from("#myGlow", {
-    scaleY : 1,
-    scaleX : 1
-})
-.to("#myGlow", {
-    scaleY : 0,
-    scaleX : 0
-})
-
-.from("#anotherGlow", {
-    scaleY : 1,
-    scaleX : 1
-})
-.to("#anotherGlow", {
-    scaleY : 0,
-    scaleX : 0
-})
-
-.from("#bigBang", {
-    scaleY : 0,
-    scaleX : 0,
-    opacity : 1
-})
-.to("#bigBang", {
-    scaleY : 3,
-    scaleX : 3,
-    opacity : 0
-});
-
-gsap.timeline({
-    scrollTrigger:{
-        trigger:"#afterBang",
-        start:"center center",
-        end:"bottom -1000%",
-        markers: false,
-        scrub : true,
-        pin : true,
-    }
-})
-
-.from("#afterBang", {opacity : 0})
-.from(".space", {
-    opacity : 0, 
-})
-
-.from(".imgOfTheSun", {
-    opacity : 0, 
-    scaleY : 14,
-    scaleX : 14,
-})
-.to(".imgOfTheSun", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".imgOfTheMercury", {
-    opacity : 0, 
-    scaleY : 54,
-    scaleX : 54,
-    x : innerWidth * 1,
-    y : innerHeight * 1
-})
-.to(".imgOfTheSun", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".imgOfTheVenus", {
-    opacity : 0, 
-    scaleY : 24,
-    scaleX : 24,
-    x : innerWidth * -1,
-    y : innerHeight * -1
-})
-.to(".imgOfTheVenus", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".imgOfTheEarth", {
-    opacity : 0, 
-    scaleY : 20,
-    scaleX : 20,
-    x : innerWidth * 1,
-    y : innerHeight * -1
-})
-.to(".imgOfTheEarth", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".imgOfTheMars", {
-    opacity : 0, 
-    scaleY : 50,
-    scaleX : 50,
-    x : innerWidth * -1,
-    y : innerHeight * 1
-})
-.to(".imgOfTheMars", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".imgOfTheJupiter", {
-    opacity : 0, 
-    scaleY : 13,
-    scaleX : 13,
-    x : innerWidth * 0.3,
-    y : innerHeight * -0.5
-})
-.to(".imgOfTheJupiter", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".imgOfTheSaturn", {
-    opacity : 0, 
-    scaleY : 17,
-    scaleX : 17,
-    x : innerWidth * -0.8,
-    y : innerHeight * 0.1
-})
-.to(".imgOfTheSaturn", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".imgOfTheUranus", {
-    opacity : 0, 
-    scaleY : 27,
-    scaleX : 27,
-    x : innerWidth * 0.5,
-    y : innerHeight * -1
-})
-.to(".imgOfTheUranus", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".imgOfTheNeptune", {
-    opacity : 0, 
-    scaleY : 30,
-    scaleX : 30,
-    x : innerWidth * -1,
-    y : innerHeight * 0.5
-})
-.to(".imgOfTheNeptune", {
-    scaleY : 1,
-    scaleX : 1
-})
-
-.from(".clickToZoom", {
-    opacity : 0, 
-    scaleY : 0,
-    scaleX : 0
-})
-.to(".clickToZoom", {
-    scaleY : 1,
-    scaleX : 1
-});
-
-gsap.timeline({
-     scrollTrigger:{
-         trigger:".box",
-         start:"center center",
-         end:"bottom -100",
-         markers: false,
-         scrub : true,
-         pin : true
-     }
- })
-
- .from("#text1", {
-    y : innerHeight * 1
-    })
- .from("#text2", {
-     x : innerWidth * -1
-    })
- .from("#text3", {
-     x : innerWidth * 1
-    })
- .from("#text4", {
-     x : innerWidth * -1,
-     y : innerHeight * -1
-    })
- .from("#text5", {
-     x : innerWidth * 1,
-     y : innerHeight * 1
-    })
-
- .from("#firstRect", {
-     scaleY: 1,
-     scaleX: 0
-     })
-     
- .to("#firstRect", {
-     scaleY: 1,
-     scaleX: 1
-    })
-
- .from("#secondRect", {
-     scaleY: 0,
-     scaleX: 1
-    })
-        
- .to("#secondRect", {
-     scaleY: 1,
-     scaleX: 1
-     });
-
-
- const sun = document.querySelector(".imgOfTheSun"),
-    mercury = document.querySelector(".imgOfTheMercury"),
-    venus = document.querySelector(".imgOfTheVenus"),
-    earth = document.querySelector(".imgOfTheEarth"),
-    mars = document.querySelector(".imgOfTheMars"),
-    jupiter = document.querySelector(".imgOfTheJupiter"),
-    saturn = document.querySelector(".imgOfTheSaturn"),
-    uranus = document.querySelector(".imgOfTheUranus"),
-    neptune = document.querySelector(".imgOfTheNeptune");
-
-function toggleSun() {
-    sun.classList.toggle("imgOfTheSunClicked");
-    }
-
-function toggleMercury() {
-    mercury.classList.toggle("imgOfTheMercuryClicked");
-    }
-
-function toggleVenus() {
-    venus.classList.toggle("imgOfTheVenusClicked");
-    }
-
-function toggleEarth() {
-    earth.classList.toggle("imgOfTheEarthClicked");
-    }
-
-function toggleMars() {
-    mars.classList.toggle("imgOfTheMarsClicked");
-    }
-
-function toggleJupiter() {
-    jupiter.classList.toggle("imgOfTheJupiterClicked");
-    }
-
-function toggleSaturn() {
-    saturn.classList.toggle("imgOfTheSaturnClicked");
-    }
-
-function toggleUranus() {
-    uranus.classList.toggle("imgOfTheUranusClicked");
-    }
-
-function toggleNeptune() {
-    neptune.classList.toggle("imgOfTheNeptuneClicked");
-    }
-
- sun.addEventListener('click', toggleSun);
- mercury.addEventListener('click', toggleMercury);
- venus.addEventListener('click', toggleVenus);
- earth.addEventListener('click', toggleEarth);
- mars.addEventListener('click', toggleMars);
- jupiter.addEventListener('click', toggleJupiter);
- saturn.addEventListener('click', toggleSaturn);
- uranus.addEventListener('click', toggleUranus);
- neptune.addEventListener('click', toggleNeptune);
-
-
-      gsap.timeline({
-        scrollTrigger:{
-            trigger:".box2",
-            start:"center center",
-            end:"bottom -100",
-            markers: false,
-            scrub : true,
-            pin : true
-        }
-    })
-   
-    .from(".box2", {
-        opacity : 0
-       })
-    .from(".text6", {
-        y : innerHeight * 1
-       })
-    .from(".text7", {
-        y : innerHeight * -1
-       })
-    .from(".text8", {
-        y : innerHeight * 1
-       });
-
-       gsap.timeline({
-        scrollTrigger:{
-            trigger:".planeSection",
-            start:"center center",
-            end:"bottom -100",
-            markers: false,
-            scrub : true,
-            pin : true
-        }
-    })
-   
-    .from(".planeSection", {
-        opacity : 0
-       })
-    .from("#firstCloud", {
-        scale : 3
-       })
-    .from("#secondCloud", {
-        scale : 3
-       })
-
-       .from("#thePlane", {
-        x : innerWidth * 1,
-        y : innerHeight * -1,
-        scale : 0
-       })
-       
-       .to("#thePlane", {
-        x : innerWidth * -1,
-        y : innerHeight * 0.5,
-        scale : 2
-       })
-       
-       .from("#boeing747", {
-        x : innerWidth * 1
-       })
-       
-       .to("#boeing747", {
-        x : innerWidth * -1.5
-       })
-       
-       .from("#f22", {
-        y : innerHeight * 1
-       })
-       
-       .to("#f22", {
-        y : innerHeight * -2.0
-       })
-       
-       .from("#mria", {
-        x : innerWidth * -0,
-        y : innerHeight * -0.8,
-        scale : 0
-       })
-       
-       .to("#mria", {
-        x : innerWidth * 0,
-        y : innerHeight * 0.8,
-        scale : 3
-       })
-        .to(".planeSection", {
-        opacity : 0
-       });
-
-       gsap.timeline({
-        scrollTrigger:{
-            trigger:"#textAfterTheSky",
-            start:"center center",
-            end:"bottom -100",
-            markers: false,
-            scrub : true,
-            pin : true
-        }
-    })
-   
-    .from("#textAfterTheSky", {
-        opacity : 0
-       })
-    .from(".text9", {
-        y : innerHeight * 1
-       })
-    .from(".text10", {
-        y : innerHeight * 1
-       })
-    .from(".text11", {
-        y : innerHeight * 1
-       })
-    .from(".text12", {
-        y : innerHeight * 1
-       })
-    .from(".text13", {
-        y : innerHeight * 1
-       })
-    .from(".text14", {
-        y : innerHeight * 1
-       })
-    .from(".text15", {
-        y : innerHeight * 1
-       })
-
-    .from(".container1", {
-        scale : 0
-       })
-    .from(".container2", {
-        scale : 0
-       });
