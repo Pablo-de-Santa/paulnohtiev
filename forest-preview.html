@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="explore.css" />
+    <title>Forest clearing · seasonal study</title>
+    <link rel="icon" href="data:," />
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three.module.min.js" } }
+    </script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #292d29;
+        color: #f1e3c7;
+        font: 13px system-ui;
+      }
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100svh;
+        image-rendering: pixelated;
+      }
+      nav {
+        position: fixed;
+        top: 18px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 3px;
+        padding: 5px;
+        background: #263c36dd;
+        border: 1px solid #c6b68e55;
+        border-radius: 8px;
+      }
+      button {
+        color: inherit;
+        background: transparent;
+        border: 0;
+        border-radius: 4px;
+        padding: 9px 13px;
+        cursor: pointer;
+        font: inherit;
+      }
+      button[aria-pressed="true"] {
+        background: #ddbd85;
+        color: #33433b;
+      }
+      .framing {
+        position: fixed;
+        bottom: 48px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 4px;
+        background: #263c36dd;
+        border-radius: 8px;
+        white-space: nowrap;
+      }
+      footer {
+        position: fixed;
+        bottom: 18px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: #fff0d1;
+        text-shadow: 0 2px 4px #28352b;
+        font-size: 12px;
+        pointer-events: none;
+      }
+      @media (max-width: 600px) {
+        button {
+          padding: 8px;
+        }
+        nav {
+          top: 10px;
+        }
+        footer {
+          bottom: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav aria-label="Preview season">
+      <button data-season="auto">Calendar</button
+      ><button data-season="spring">Spring</button
+      ><button data-season="summer">Summer</button
+      ><button data-season="autumn">Autumn</button
+      ><button data-season="winter">Winter</button>
+    </nav>
+    <div class="framing" role="group" aria-label="Camera framing">
+      <button data-framing="close" aria-pressed="true">Close view</button
+      ><button data-framing="wide" aria-pressed="false">Clearing</button>
+    </div>
+    <div
+      style="
+        position: fixed;
+        bottom: 95px;
+        left: 50%;
+        transform: translateX(-50%);
+      "
+    >
+      <button id="explore-button" aria-pressed="false">Explore</button>
+    </div>
+    <footer id="status">Loading the clearing…</footer>
+    <script type="module" src="forest-preview.js"></script>
+  </body>
+</html>

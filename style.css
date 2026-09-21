@@ -1,654 +1,386 @@
-*{
-    margin: 0;
-    padding: 0;
-    font-family: Courier, monospace;
-    box-sizing: border-box;
+:root {
+  color-scheme: dark;
+  font-family: Courier, "Courier New", monospace;
+  color: #f5f5f5;
+  background: #000;
 }
-
-body{
-    overflow-x: hidden;
-    background: #000;
+* {
+  box-sizing: border-box;
 }
-
-section{
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: #000;
+body {
+  margin: 0;
+  overflow-x: hidden;
 }
-
-#myGlow{
-    font-size: 6em;
-    color: white;
-    font-weight: 500;
-    text-align: center;
-    -webkit-animation: glow 1s ease-in-out infinite alternate;
-    -moz-animation: glow 1s ease-in-out infinite alternate;
-    animation: glow 1s ease-in-out infinite alternate;
-    display: block;
-    position: relative;
-    top: 40%;
+a {
+  color: inherit;
+  text-decoration: none;
 }
-
-@-webkit-keyframes glow {
-    from {
-      text-shadow: 0 0 10px #fff, 0 0 20px #fff;
-    }
-    
-    to {
-      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
-    }
-  }
-
-#anotherGlow{
-    font-size: 1em;
-    color: white;
-    font-weight: 500;
-    text-align: center;
-    -webkit-animation: glow 1s ease-in-out infinite alternate;
-    -moz-animation: glow 1s ease-in-out infinite alternate;
-    animation: glow 1s ease-in-out infinite alternate;
-    display: block;
-    position: relative;
-    top: 40%;
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
 }
-
-@-webkit-keyframes anotherGlow {
-    from {
-      text-shadow: 0 0 10px #fff, 0 0 20px #fff;
-    }
-    
-    to {
-      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
-    }
-  }
-
-#bigBang {
-    width: 100%;
-    height: 100vh;
-    position: relative;
-    top: -20%;
-    background-color: white;
-    border-radius: 50%;
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
 }
-
-
-#afterBang{
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    background: #000;
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #c9e6fc;
+  outline-offset: 6px;
 }
-
-.space {
-    width: 100%;
-    height: 100%;
-    background-color: black;
+[hidden] {
+  display: none !important;
 }
-
-.imgOfTheSun{
-    height: 100px;
-    position: relative;
-    top: -60%;
-    left: 45%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheSunClicked{
-    height: 600px;
-    top: -95%;
-    left: 27%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
+#scene,
+#atmosphere-veil {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
 }
-
-.imgOfTheMercury{
-    height: 15px;
-    position: relative;
-    top: -60%;
-    left: 45%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheMercuryClicked{
-    height: 400px;
-    top: -75%;
-    left: 14%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
-    cursor: pointer;
+#scene {
+  z-index: 0;
 }
-
-.imgOfTheVenus{
-    height: 20px;
-    position: relative;
-    top: -53%;
-    left: 30%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheVenusClicked{
-    height: 400px;
-    top: -80%;
-    left: 16%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
-    cursor: pointer;
+#scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-
-.imgOfTheEarth{
-    height: 23px;
-    position: relative;
-    top: -45%;
-    left: 33%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheEarthClicked{
-    height: 400px;
-    top: -80%;
-    left: 21%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
-    cursor: pointer;
+#atmosphere-veil {
+  z-index: 1;
+  background: #6e8394;
+  opacity: 0;
 }
-
-.imgOfTheMars{
-    height: 17px;
-    position: relative;
-    top: -90%;
-    left: 33%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheMarsClicked{
-    height: 400px;
-    top: -80%;
-    left: 3%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
-    cursor: pointer;
-}
-
-.imgOfTheJupiter{
-    height: 60px;
-    position: relative;
-    top: -40%;
-    left: 45%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheJupiterClicked{
-    height: 350px;
-    top: -80%;
-    left: 17%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
-    cursor: pointer;
-}
-
-.imgOfTheSaturn{
-    height: 45px;
-    position: relative;
-    top: -90%;
-    left: -4%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheSaturnClicked{
-    height: 300px;
-    top: -80%;
-    left: 1%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
-    cursor: pointer;
-}
-
-.imgOfTheUranus{
-    height: 35px;
-    position: relative;
-    top: -25%;
-    left: -18%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheUranusClicked{
-    height: 500px;
-    top: -80%;
-    left: -1%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
-    cursor: pointer;
-}
-
-.imgOfTheNeptune{
-    height: 32px;
-    position: relative;
-    top: -100%;
-    left: 55%;
-    z-index: 1;
-    transition: 0.3s;
-    background-color: transparent;
-    cursor: pointer;
-} 
-
-.imgOfTheNeptuneClicked{
-    height: 500px;
-    top: -80%;
-    left: -3%;
-    z-index: 100;
-    cursor: pointer;
-    transition: 0.3s;
-    cursor: pointer;
-}
-
-.clickToZoom{
-    font-size: 2em;
-    color: white;
-    font-weight: 500;
-    text-align: center;
-    -webkit-animation: glow 1s ease-in-out infinite alternate;
-    -moz-animation: glow 1s ease-in-out infinite alternate;
-    animation: glow 1s ease-in-out infinite alternate;
-    display: block;
-    position: relative;
-    top: -115%;
-}
-
-.box{
-    margin-top: 3em;
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    padding: 100px;
-    background-image: url("images/universe/closeEarth.png");
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    text-align: center;
-}
-
-.box h2{
-    font-size: 3em;
-}
-
-.box h1{
-    font-size: 3em;
-}
-
-#text1, #text2, #text3, #text4, #text5{
-    padding-top: 0.1em;
-    font-weight: 500;
-    color: #000;
-    text-align: center;
-    -webkit-animation: glow 1s ease-in-out infinite alternate;
-    -moz-animation: glow 1s ease-in-out infinite alternate;
-    animation: glow 1s ease-in-out infinite alternate;
-}
-
-@-webkit-keyframes glow {
-    from {
-      text-shadow: 0 0 10px #000, 0 0 20px rgb(99, 99, 99);
-    }
-    
-    to {
-      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
-    }
-  }
-  
-  #myDocs{
-    padding: 2em 0 0 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  #firstRect{
-    height: 200px;
-    width: 300px;
-    border: 3px dashed rgb(53, 53, 53);
-    border-radius: 10%;
-    margin-right: 50px;
-    transition: 0.3s;
-    background: #fff;
-  }
-
-  #firstRect:hover{
-    background: #42275a;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #734b6d, #42275a);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #734b6d, #42275a); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    border: 3px solid black;
-  }
-
-  #firstRect img{
-      margin-top: 15px;
-      width: 150px;
-      height: 150px;
-  }
-
-  #secondRect{
-    height: 200px;
-    width: 300px;
-    border: 3px dashed rgb(53, 53, 53);
-    border-radius: 10%;
-    margin-left: 50px;
-    transition: 0.3s;
-    background: #fff;
-}
-
-#secondRect:hover{
-    background: #42275a;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #734b6d, #42275a);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #734b6d, #42275a); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    border: 3px solid black;
-  }
-
-#secondRect img{
-    margin-top: 15px;
-    width: 150px;
-    height: 150px;
-}
-
-.box2{
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    background: #000;
-    text-align: center;
-}
-
-.box2 h2{
-    font-size: 3em;
-    color: #fff;
-}
-
-#textAroundStars{
-    padding-top: 15em;
-    position: relative;
-    top: 5%;
-}
-
-#textAroundStars{
-    font-weight: 500;
-    color: #fff;
-    text-align: center;
-    -webkit-animation: glow 1s ease-in-out infinite alternate;
-    -moz-animation: glow 1s ease-in-out infinite alternate;
-    animation: glow 1s ease-in-out infinite alternate;
-}
-
-@-webkit-keyframes glow {
-    from {
-      text-shadow: 0 0 10px #000, 0 0 20px rgb(99, 99, 99);
-    }
-    
-    to {
-      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
-    }
-  }
-
-/* Stars */
-
-.canvas {
-    width: 100%;
-    height: 100%;
-    clear: both;
-    overflow: hidden;
-    position: relative;
-    bottom: 60%;
-    z-index: -1;
-  }
-  
-  .star {
-    position: absolute;
-    border-radius: 50%;
-    background: #fff;
-    -webkit-box-shadow: 0 0 5px rgba(255, 255, 255, 0.75);
-    -moz-box-shadow: 0 0 5px rgba(255, 255, 255, 0.75);
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.75);
-  }
-  
-  .streak {
-    background: #fff;
-    border-radius: 100%;
-    width: 10px;
-    height: 250px;
-    position: relative;
-    top: 100px;
-    left: 100px;
-    -webkit-box-shadow: 0 0 25px rgba(255, 255, 255, 0.75);
-    -moz-box-shadow: 0 0 25px rgba(255, 255, 255, 0.75);
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.75);
-    -moz-transform: rotate(-135deg);
-    -webkit-transform: rotate(-135deg);
-    -o-transform: rotate(-135deg);
-    -ms-transform: rotate(-135deg);
-    transform: rotate(-135deg);
-    background: -moz-linear-gradient(top, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(25%, white), color-stop(100%, rgba(255, 255, 255, 0)));
-    background: -webkit-linear-gradient(top, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
-    background: -o-linear-gradient(top, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
-    background: -ms-linear-gradient(top, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
-    background: linear-gradient(to bottom, white 0%, rgba(255, 255, 255, 0.75) 25%, rgba(255, 255, 255, 0) 100%);
-  }
-
-  .planeSection{
-      background-image: url("images/planeSetion/sky.jpg");
-      width: 100%;
-      height: 100vh;
-      background-attachment: fixed;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-  }
-
-  #cloudHoder{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-  }
-
-  #firstCloud{
-      position: relative;
-      display: inline-block;
-  }
-
-  #secondCloud{
-    position: relative;
-    display: inline-block;
-}
-
-#thePlane{
-    position: relative;
-    display: inline-block;
-    top: -300px;
-    left: 300px;
-}
-
-#boeing747{
-    position: relative;
-    display: inline-block;
-    top: -300px;
-    left: 630px;
-}
-
-#f22{
-    position: relative;
-    display: inline-block;
-    top: -250px;
-    left: 450px;
-}
-
-
-#mria{
-    position: relative;
-    display: inline-block;
-    top: -800px;
-    left: -150px;
-}
-
-/* 2 Pics */
-
-#wrapOf2Pic {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-height: 70vh;
-    min-width: 100%;
-    margin-top: 2em;
-}
-
-.container1 {
-	position: relative;
-	width: 400px;
-	height: 400px;
-  border: 4px solid white;	
-  margin: 0 4.5em;
-}
-
-.container1 .myBox {
-	position: absolute;
-	width: 100%;
-    height: 100%;
-}
-
-.container1 .myBox:nth-child(1){
-  background: url(images/contscts/gmail.png);
-  background-repeat: no-repeat;
-	background-size: cover;
-}
-
-.container1 .myBox:nth-child(2){
-  background: url(images/contscts/linkedIn.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-	z-index: 2;
-	transition: .3s;
-	clip-path: polygon(0 0, 100% 0, 100% 0, 0% 100%);
-}
-
-.container1 .myBox:nth-child(2):hover{
-	clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
-}
-
-.container1 .myBox:nth-child(1):hover ~ .myBox:nth-child(2){
-	clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
-}
-
-.container2 {
-	position: relative;
-	width: 400px;
-	height: 400px;
-  border: 4px solid white;	
-  margin: 0 4.5em;
-}
-
-.container2 .myBox {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-}
-
-.container2 .myBox:nth-child(1){
-    background: url(images/contscts/instagram.png);
-  background-size: auto;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.container2 .myBox:nth-child(2){
-    background: url(images/contscts/facebook.png);
-    background-size: cover;
-	z-index: 2;
-	transition: .3s;
-  clip-path: polygon(0 0, 100% 100%, 100% 100%, 0 100%);
-  background-repeat: no-repeat;
-}
-
-.container2 .myBox:nth-child(2):hover{
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-}
-
-.container2 .myBox:nth-child(1):hover ~ .myBox:nth-child(2){
-  clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
-}
-
-.before, .after{
+.chapter {
   position: relative;
+  z-index: 2;
+  pointer-events: none;
+  height: 200svh;
+}
+#top {
+  height: 180svh;
+}
+#afterBang {
+  height: 780svh;
+}
+#descent {
+  height: 240svh;
+}
+#aviation {
+  height: 560svh;
+}
+#contact {
+  height: 620svh;
+}
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  padding: 6vw;
+}
+.welcome {
+  justify-content: center;
   text-align: center;
-  top: 80%;
-  font-family: 'Gabriola', serif;
-  font-size: 3em;
 }
-
-#textAfterTheSky{
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    background: #000;
-    text-align: center;
+.welcome h1 {
+  font-weight: 400;
+  font-size: clamp(56px, 7vw, 100px);
+  margin: 0 0 18px;
+  text-shadow: 0 0 20px #ffffff55;
 }
-
-#textAfterTheSky h2{
-    font-size: 1em;
-    color: #fff;
+.welcome p {
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin: 0;
 }
-
-#textAfterTheSky{
-    font-weight: 500;
-    color: #fff;
-    text-align: center;
-    -webkit-animation: glow 1s ease-in-out infinite alternate;
-    -moz-animation: glow 1s ease-in-out infinite alternate;
-    animation: glow 1s ease-in-out infinite alternate;
+.copy {
+  max-width: 540px;
+  pointer-events: auto;
+  text-shadow: 0 2px 24px #000;
 }
-
-@-webkit-keyframes glow {
-    from {
-      text-shadow: 0 0 10px #000, 0 0 20px rgb(99, 99, 99);
-    }
-    
-    to {
-      text-shadow: 0 0 20px #fff, 0 0 30px #e6e6e6, 0 0 40px #d6d6d6;
-    }
+.copy h2 {
+  font-size: clamp(32px, 3.7vw, 58px);
+  line-height: 1.2;
+  font-weight: 400;
+  margin: 16px 0 28px;
+  letter-spacing: -2px;
+}
+.copy p {
+  font-size: clamp(14px, 1.3vw, 19px);
+  line-height: 1.6;
+  margin: 10px 0;
+}
+.copy .profession {
+  font-size: clamp(11px, 1.1vw, 17px);
+  letter-spacing: 1px;
+}
+.copy .personal-note {
+  max-width: 35ch;
+  margin-top: 22px;
+}
+#contact-copy {
+  position: absolute;
+  bottom: 9vh;
+  left: 5vw;
+  right: 5vw;
+  text-align: center;
+  pointer-events: auto;
+  color: #fff;
+  text-shadow: 0 2px 10px #173219;
+}
+#contact-copy h2 {
+  font-size: clamp(17px, 2vw, 28px);
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+.contact-links,
+.secondary-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 28px;
+}
+.contact-links a {
+  font-size: 14px;
+  border-bottom: 1px solid #ffffff80;
+  padding: 7px 0;
+}
+.secondary-links {
+  margin-top: 19px;
+  gap: 12px 22px;
+}
+.secondary-links a {
+  font-size: 10px;
+  color: #ebeee5;
+}
+.contact-links a:hover,
+.secondary-links a:hover {
+  color: #fff0b9;
+}
+.sr-only,
+.object-controls button {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.object-controls button:focus {
+  position: fixed;
+  z-index: 20;
+  top: 18px;
+  left: 18px;
+  width: auto;
+  height: auto;
+  clip-path: none;
+  margin: 0;
+  background: #151c24;
+  padding: 14px 24px;
+  border: 1px solid #afc5d3;
+  color: #fff;
+}
+.scene-unavailable #afterBang,
+.scene-unavailable #descent,
+.scene-unavailable #aviation {
+  display: none;
+}
+.scene-unavailable .chapter {
+  height: 100svh !important;
+}
+.scene-unavailable .stage {
+  position: relative;
+}
+.scene-unavailable #contact-copy {
+  bottom: 30vh;
+}
+.scene-unavailable #scene {
+  background: #000;
+}
+@media (max-width: 700px) {
+  .stage {
+    padding: 8vw;
   }
-
-  a{
-      text-decoration: none;
-      color: white;
+  .copy {
+    align-self: flex-start;
+    margin-top: 12vh;
+    max-width: 90%;
   }
+  .copy h2 {
+    font-size: 32px;
+    letter-spacing: -1px;
+    margin-bottom: 18px;
+  }
+  .copy p {
+    font-size: 13px;
+  }
+  .copy .profession {
+    font-size: 10px;
+    letter-spacing: 0.6px;
+  }
+  .welcome h1 {
+    font-size: 54px;
+  }
+  .welcome p {
+    font-size: 10px;
+  }
+  #contact-copy {
+    bottom: 12vh;
+    left: 7vw;
+    right: 7vw;
+  }
+  #contact-copy h2 {
+    font-size: 17px;
+    margin-bottom: 15px;
+  }
+  .contact-links {
+    gap: 12px 20px;
+  }
+  .contact-links a {
+    font-size: 12px;
+  }
+  .secondary-links {
+    gap: 12px 17px;
+  }
+  .secondary-links a {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
 
+.welcome h1 {
+  animation: welcome-pulse 2.6s ease-in-out infinite;
+}
+/* Small lettering needs a tighter glow; keep brightness constant while breathing. */
+.welcome p {
+  text-shadow: 0 0 3px #ffffff55;
+  animation: scroll-glow 3.6s ease-in-out infinite both;
+}
+@keyframes scroll-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 3px #ffffff55;
+  }
+  50% {
+    text-shadow: 0 0 8px #ffffff55;
+  }
+}
+@keyframes welcome-pulse {
+  0%,
+  100% {
+    text-shadow: 0 0 12px #ffffff30;
+  }
+  50% {
+    text-shadow: 0 0 32px #ffffff88;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome h1,
+  .welcome p {
+    animation: none;
+  }
+}
 
+/* Earth copy follows the fixed camera view, independently of section height. */
+#earth-copy {
+  position: fixed;
+  left: 6vw;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+@media (max-width: 700px) {
+  #earth-copy {
+    left: 8vw;
+    top: 9vh;
+    transform: none;
+    margin: 0;
+  }
+}
+
+.scene-unavailable #earth-copy {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  margin: 0;
+}
+
+#welcome-copy[role="button"] {
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+html.journey-loading,
+.journey-loading body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+#journey-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+.loader-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.1%;
+  background: #030508;
+  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.loader-left {
+  left: 0;
+}
+.loader-right {
+  right: 0;
+}
+.loader-label {
+  position: relative;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: #b9c6d4;
+  transition:
+    opacity 0.2s,
+    filter 0.2s;
+}
+.loader-dots {
+  animation: loader-breathe 1.3s ease-in-out infinite alternate;
+}
+.opening .loader-left {
+  transform: translateX(-100%);
+}
+.opening .loader-right {
+  transform: translateX(100%);
+}
+.opening .loader-label {
+  opacity: 0;
+  filter: blur(5px);
+}
+@keyframes loader-breathe {
+  to {
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader-dots {
+    animation: none;
+  }
+  .loader-panel,
+  .loader-label {
+    transition: none;
+  }
+}

@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+
+*.blend1
+
+# Generated visual checks and exported video experiments
+previews/
+assets/video/

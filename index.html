@@ -1,127 +1,154 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Paul Nohtiev. Professional web developer."
+    />
     <title>Paul</title>
-    <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script> 
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/jquery.ScrollMagic.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/debug.addIndicators.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/animation.gsap.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenLite.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TimelineLite.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/plugins/CSSPlugin.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/plugins/BezierPlugin.min.js"></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.11.5/TweenMax.min.js'></script>
-</head>
-<body>
-
-    <section id="top">
-        <h1 id="myGlow">Welcome</h1>
-        <h4 id="anotherGlow">SCROLL DOWN</h4>
-        <div id="bigBang"></div>
-    </section>
-
-    <section id="afterBang">
-        <img class="space" src="images/universe/space.jpg"/>
-        <img class="imgOfTheSun" src="images/universe/sun.png" alt="sun">
-        <img class="imgOfTheMercury" src="images/universe/mercury.png" alt="Mercury">
-        <img class="imgOfTheVenus" src="images/universe/venus.png" alt="Venus">
-        <img class="imgOfTheEarth" src="images/universe/earth.png" alt="Earth">
-        <img class="imgOfTheMars" src="images/universe/mars.png" alt="Mars">
-        <img class="imgOfTheJupiter" src="images/universe/jupiter.png" alt="Jupiter">
-        <img class="imgOfTheSaturn" src="images/universe/saturn.png" alt="Saturn">
-        <img class="imgOfTheUranus" src="images/universe/uranus.png" alt="Uranus">
-        <img class="imgOfTheNeptune" src="images/universe/neptune.png" alt="Neptune">
-
-        <div class="clickToZoom">CLICK ON THE PLANETS AND SUN TO ZOOM IN</div>
-
-    </section>
-    
-    <div class="box">
-        
-        <h2 id="text1">Hello World!</h2>
-        <h2 id="text2">My name is Paul Nohtiev.</h2>
-        <h2 id="text3">And I am a</h2>
-        <h1 id="text4">PROFESSIONAL WEB DEVELOPER.</h1>
-        <h2 id="text5">Let me introduce myself.</h2>
-
-        <div id="myDocs">
-            <div id="firstRect">
-                <a href="images/Docs/Resume_(Paul_Nohtiev).pdf" target="_blank">
-                    <img src="images/Docs/resume.png">
-                </a>
-                <p>Here is my Resume</p>
-            </div>
-            <div id="secondRect">
-                <a href="images/Docs/Cover_Letter_(Paul_Nohtiev).pdf" target="_blank">
-                    <img src="images/Docs/coverLetter.png">
-                </a>    
-                <p>Here is my Cover Letter</p>
-            </div>
-        </div>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="explore.css" />
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three.module.min.js" } }
+    </script>
+    <script defer src="vendor/gsap.min.js"></script>
+    <script defer src="vendor/ScrollTrigger.min.js"></script>
+    <script type="module" src="script.js"></script>
+  </head>
+  <body>
+    <script src="loading.js"></script>
+    <div id="journey-loader" role="status" aria-label="Loading scene" hidden>
+      <div class="loader-panel loader-left"></div>
+      <div class="loader-panel loader-right"></div>
+      <span class="loader-label"
+        >Loading<span class="loader-dots">...</span></span
+      >
     </div>
-
-    <div class="box2">
-
-        <div id="textAroundStars">
-            <h2 class="text6">As you could see</h2>
-            <h2 class="text7">Besides coding</h2>
-            <h2 class="text8">I like space</h2>
+    <script>
+      window.journeyLoader?.show();
+    </script>
+    <div id="scene" aria-hidden="true"></div>
+    <div id="atmosphere-veil" aria-hidden="true"></div>
+    <main>
+      <section id="top" class="chapter" aria-label="Welcome">
+        <div class="stage welcome">
+          <div id="welcome-copy">
+            <h1>Welcome</h1>
+            <p>SCROLL DOWN</p>
+          </div>
         </div>
-        
-        <div class='canvas'>
-            <div class='streak'></div>
+      </section>
+      <section id="afterBang" class="chapter" aria-label="Sun and planets">
+        <div class="stage"></div>
+      </section>
+      <section id="about" class="chapter" aria-label="Paul Nohtiev">
+        <div class="stage">
+          <div id="earth-copy" class="copy">
+            <p>Hello World!</p>
+            <h2>My name is<br />Paul Nohtiev.</h2>
+            <p>And I am a</p>
+            <p class="profession">PROFESSIONAL WEB DEVELOPER.</p>
+            <p class="personal-note">
+              I like building unique and unusual things—like this.
+            </p>
+          </div>
         </div>
-
-    </div>
-
-    <div class="planeSection">
-
-        <div id="cloudHoder">
-            <img id="firstCloud" src="images/planeSetion/cloud1.png" alt="cloud">
-            <img id="secondCloud" src="images/planeSetion/cloud2.png" alt="cloud">
-        </div>
-
-        <img id="thePlane" src="images/planeSetion/plane.png" alt="Airbus A380">
-
-        <img id="boeing747" src="images/planeSetion/Boeing-747.png" alt="Boeing 747">
-
-        <img id="f22" src="images/planeSetion/f22.png" alt="F22">
-
-        <img id="mria" src="images/planeSetion/mria.png" alt="mria">
-
-    </div>
-
-    <div id="textAfterTheSky">
-
-        <h2 class="text9">Also, I am a</h2>
-        <h2 class="text10">huge fan of</h2>
-        <h2 class="text11">planes.</h2>
-
-        <h2 class="text12">Let's build</h2>
-        <h2 class="text13">Wonderful things</h2>
-        <h2 class="text14">Together</h2>
-
-        <div id="wrapOf2Pic">
-        
-            <div class="container1">
-                <div class="myBox"><a href="mailto:nogtevpasha97@gmail.com"><p class="before">Gmail</p></a></div>
-                <div class="myBox"><a href="https://www.linkedin.com/in/paul-nohtiev-b61626130/"><p class="after">LinkedIn</p></a></div>
+      </section>
+      <section id="descent" class="chapter" aria-label="Earth clouds">
+        <div class="stage"></div>
+      </section>
+      <section id="aviation" class="chapter" aria-label="Planes">
+        <div class="stage"></div>
+      </section>
+      <section id="contact" class="chapter" aria-label="Contact Paul">
+        <div class="stage">
+          <div id="contact-copy">
+            <h2>Let's build Wonderful things Together</h2>
+            <button
+              id="explore-button"
+              type="button"
+              aria-pressed="false"
+              disabled
+            >
+              Explore
+            </button>
+            <div class="contact-links">
+              <a href="mailto:nogtevpasha97@gmail.com">Gmail</a>
+              <a
+                href="https://www.linkedin.com/in/paul-nohtiev-b61626130/"
+                target="_blank"
+                rel="noopener"
+                >LinkedIn</a
+              >
+              <a id="portfolio-link" hidden target="_blank" rel="noopener"
+                >Portfolio</a
+              >
+              <a
+                href="images/Docs/Resume_(Paul_Nohtiev).pdf"
+                target="_blank"
+                rel="noopener"
+                >Here is my Resume</a
+              >
             </div>
-            
-            <div class="container2">
-              <div class="myBox"><a href="https://www.instagram.com/pablo_de_santa/?hl=en"><p class="before">Instagram</p></a></div>
-              <div class="myBox"><a href="https://www.facebook.com/profile.php?id=100008044125192"><p class="after">Facebook</p></a></div>
+            <div class="secondary-links">
+              <a
+                href="images/Docs/Cover_Letter_(Paul_Nohtiev).pdf"
+                target="_blank"
+                rel="noopener"
+                >Here is my Cover Letter</a
+              >
+              <a
+                href="https://www.instagram.com/pablo_de_santa/?hl=en"
+                target="_blank"
+                rel="noopener"
+                >Instagram</a
+              >
+              <a
+                href="https://www.facebook.com/profile.php?id=100008044125192"
+                target="_blank"
+                rel="noopener"
+                >Facebook</a
+              >
+              <a href="credits.html" aria-label="Asset credits">ⓘ</a>
             </div>
-
+          </div>
         </div>
-
-    </div>
-
-</body>
+      </section>
+    </main>
+    <div
+      id="object-controls"
+      class="object-controls"
+      aria-label="3D objects"
+    ></div>
+    <p id="interaction-status" class="sr-only" role="status"></p>
+    <p id="scene-error" class="sr-only" role="status" hidden>
+      The 3D scene is unavailable. Documents and contact links remain available.
+    </p>
+    <noscript
+      ><style>
+        .chapter {
+          height: auto !important;
+        }
+        .stage {
+          position: relative;
+          height: 100svh;
+        }
+        #earth-copy {
+          position: relative;
+          left: auto;
+          top: auto;
+          transform: none;
+        }
+        #afterBang,
+        #descent,
+        #aviation {
+          display: none;
+        }
+      </style></noscript
+    >
+  </body>
 </html>
