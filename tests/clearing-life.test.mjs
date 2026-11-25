@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { localHour, daylightAt } from "../clearing-life.js";
-import { cabinWalkable, cabinFloor, doorPanelBlocks } from "../cabin.js";
+import { localHour, daylightAt } from "../src/clearing/clearing-life.js";
+import { cabinWalkable, cabinFloor, doorPanelBlocks } from "../src/clearing/cabin.js";
 test("local clock fallback is noon and daylight varies continuously", () => {
   assert.equal(localHour(new Date("invalid")), 12);
   assert.equal(localHour(new Date(2026, 8, 20, 8, 30)), 8.5);
@@ -32,7 +32,7 @@ test("door panel blocks its closed and swung positions but clears the open passa
 });
 
 test("indoor actions exclude porch, all exterior walls and above the cabin", async () => {
-  const { isInsideCabin } = await import("../cabin.js");
+  const { isInsideCabin } = await import("../src/clearing/cabin.js");
   assert(isInsideCabin({ x: 5.8, y: 2.3, z: -5.1 }));
   for (const p of [
     { x: 5.8, y: 1.7, z: -3.2 },

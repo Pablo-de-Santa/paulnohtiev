@@ -15,7 +15,7 @@ const assert = require("node:assert/strict");
         "/tilt-test.html",
     );
     const result = await page.evaluate(async () => {
-      const { createDeviceTilt } = await import("/device-tilt.js");
+      const { createDeviceTilt } = await import("/src/shared/device-tilt.js");
       let calls = 0,
         suspended = false,
         enabled = false,

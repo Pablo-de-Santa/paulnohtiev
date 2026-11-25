@@ -3,6 +3,9 @@ node_modules/
 
 *.blend1
 
+# Historical TLS key material is stored outside the website checkout.
+/certificare/generated-private-key.txt
+
 # Generated visual checks and exported video experiments
 previews/
 assets/video/

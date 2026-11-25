@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { phaseAtScroll, flightPaths } from "../choreography.js";
+import { phaseAtScroll, flightPaths } from "../src/journey/choreography.js";
 
 test("chapter mapping is continuous, reversible, and handles the final viewport", () => {
   const offsets = [0, 1800, 7300, 9300, 11700, 17300],
@@ -37,7 +37,7 @@ test("aircraft use four distinct 3D paths and valid forward directions", () => {
 
 test("solar orbits remain separated and inside wide and narrow viewports", async () => {
   const { solarPosition, solarSizes, solarExtent } =
-    await import("../choreography.js");
+    await import("../src/journey/choreography.js");
   for (const aspect of [0.38, 0.46, 1, 1.6, 2.4])
     for (let t = 0; t < 300; t += 0.5) {
       const positions = solarSizes.map((_, i) => solarPosition(i, t, aspect));
@@ -60,7 +60,7 @@ test("solar orbits remain separated and inside wide and narrow viewports", async
 });
 
 test("heavy aircraft remain upright in either flight direction", async () => {
-  const { flightOrientation } = await import("../choreography.js");
+  const { flightOrientation } = await import("../src/journey/choreography.js");
   const THREE = await import("../vendor/three.module.min.js");
   for (const index of [0, 1, 2, 3])
     for (let i = 0; i <= 100; i++) {
@@ -74,7 +74,7 @@ test("heavy aircraft remain upright in either flight direction", async () => {
 });
 
 test("Edmonton maps to the center of the locked Earth view", async () => {
-  const { edmontonNormal, surfaceNormal } = await import("../choreography.js");
+  const { edmontonNormal, surfaceNormal } = await import("../src/journey/choreography.js");
   const THREE = await import("../vendor/three.module.min.js");
   const front = new THREE.Vector3(0, 0, 1),
     q = new THREE.Quaternion().setFromUnitVectors(edmontonNormal, front);
@@ -86,7 +86,7 @@ test("Edmonton maps to the center of the locked Earth view", async () => {
 });
 
 test("full-size aircraft start and finish outside the camera frustum", async () => {
-  const { flightPathsForViewport } = await import("../choreography.js");
+  const { flightPathsForViewport } = await import("../src/journey/choreography.js");
   const THREE = await import("../vendor/three.module.min.js");
   for (const mobile of [false, true])
     for (const aspect of [0.38, 0.46, 1, 1.6, 2.4, 3.6]) {
@@ -119,7 +119,7 @@ test("full-size aircraft start and finish outside the camera frustum", async () 
 });
 
 test("cinematic orbital clocks keep speed ordering while making outer planets visible", async () => {
-  const { solarSpeeds, moonAngularSpeed } = await import("../choreography.js");
+  const { solarSpeeds, moonAngularSpeed } = await import("../src/journey/choreography.js");
   assert.equal(solarSpeeds[0], 0);
   for (let i = 1; i < 8; i++) assert.ok(solarSpeeds[i] > solarSpeeds[i + 1]);
   assert.ok(solarSpeeds[8] > 0.03);
@@ -128,7 +128,7 @@ test("cinematic orbital clocks keep speed ordering while making outer planets vi
 
 test("galaxies are fully behind the camera before the solar reveal at every aspect", async () => {
   const { cosmicCameraOffset, smooth, solarExtent } =
-    await import("../choreography.js");
+    await import("../src/journey/choreography.js");
   for (const aspect of [0.38, 0.46, 1, 1.6, 2.4, 3.6]) {
     const cameraZ =
       (solarExtent * Math.max(1, 1 / aspect)) / Math.tan((21 * Math.PI) / 180);
@@ -140,7 +140,7 @@ test("galaxies are fully behind the camera before the solar reveal at every aspe
 });
 
 test("Moon keeps the same face toward Earth and a stable orbital pole", async () => {
-  const { moonPose } = await import("../choreography.js");
+  const { moonPose } = await import("../src/journey/choreography.js");
   const THREE = await import("../vendor/three.module.min.js");
   for (const mobile of [false, true]) {
     const north = new THREE.Vector3(0, 1, 0).applyQuaternion(
@@ -169,7 +169,7 @@ test("Moon keeps the same face toward Earth and a stable orbital pole", async ()
 
 test("Earth arrives at Edmonton eastward and holds its final orientation", async () => {
   const { earthArrivalPose, edmontonNormal, axialSpeeds, earthSunDirection } =
-    await import("../choreography.js");
+    await import("../src/journey/choreography.js");
   const THREE = await import("../vendor/three.module.min.js");
   assert.deepEqual(
     axialSpeeds.slice(1).map(Math.sign),
@@ -202,7 +202,7 @@ test("Earth arrives at Edmonton eastward and holds its final orientation", async
 });
 
 test("sky descent is continuous, forward and downward on desktop and mobile", async () => {
-  const { descentPose } = await import("../choreography.js");
+  const { descentPose } = await import("../src/journey/choreography.js");
   for (const mobile of [false, true]) {
     let previous = descentPose(3.76, mobile).position;
     for (let phase = 3.765; phase <= 5.865; phase += 0.005) {
@@ -224,7 +224,7 @@ test("sky descent is continuous, forward and downward on desktop and mobile", as
 
 test("airliners keep a constant heading and engine outlets stay outside the fuselage", async () => {
   const { aircraftPose, engineOutlets, flightPathsForViewport } =
-    await import("../choreography.js");
+    await import("../src/journey/choreography.js");
   for (const mobile of [false, true]) {
     const paths = flightPathsForViewport(mobile ? 0.46 : 1.6, mobile);
     for (let index = 0; index < paths.length; index++) {

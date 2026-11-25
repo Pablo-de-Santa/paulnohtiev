@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { soundMix, seasonalSound } from "../clearing-audio.js";
+import { soundMix, seasonalSound } from "../src/clearing/clearing-audio.js";
 test("nearby sources are louder and pan according to listener orientation", () => {
   const ear = { x: 0, z: 0 };
   assert(

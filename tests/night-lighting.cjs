@@ -23,8 +23,8 @@ const assert = require("node:assert/strict");
     );
     const values = await page.evaluate(async () => {
       const THREE = await import("/vendor/three.module.min.js"),
-        { loadAssets } = await import("/assets.js"),
-        { createPlanet } = await import("/models.js");
+        { loadAssets } = await import("/src/journey/assets.js"),
+        { createPlanet } = await import("/src/journey/models.js");
       const assets = await loadAssets();
       if (assets.failures.length) throw new Error(assets.failures.join(","));
       const earth = createPlanet("Earth", assets.textures),

@@ -6,21 +6,47 @@
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Paul Nohtiev. Professional web developer."
+      content="Explore Paul Nohtiev’s interactive 3D portfolio, view his résumé, and get in touch with a web developer who builds unusual web experiences."
     />
-    <title>Paul</title>
+    <title>Paul Nohtiev | Web Developer Portfolio</title>
+    <link rel="canonical" href="https://paulnohtiev.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://paulnohtiev.com/" />
+    <meta property="og:title" content="Paul Nohtiev | Web Developer Portfolio" />
+    <meta
+      property="og:description"
+      content="Explore Paul Nohtiev’s interactive 3D portfolio, view his résumé, and get in touch."
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "url": "https://paulnohtiev.com/",
+        "mainEntity": {
+          "@type": "Person",
+          "name": "Paul Nohtiev",
+          "jobTitle": "Web Developer",
+          "url": "https://paulnohtiev.com/",
+          "sameAs": [
+            "https://www.linkedin.com/in/paul-nohtiev-b61626130/",
+            "https://www.instagram.com/pablo_de_santa/",
+            "https://www.facebook.com/profile.php?id=100008044125192"
+          ]
+        }
+      }
+    </script>
     <link rel="icon" href="data:," />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="explore.css" />
+    <link rel="stylesheet" href="src/styles/portfolio.css" />
+    <link rel="stylesheet" href="src/styles/explore.css" />
     <script type="importmap">
       { "imports": { "three": "./vendor/three.module.min.js" } }
     </script>
     <script defer src="vendor/gsap.min.js"></script>
     <script defer src="vendor/ScrollTrigger.min.js"></script>
-    <script type="module" src="script.js"></script>
+    <script type="module" src="src/journey/main.js"></script>
   </head>
   <body>
-    <script src="loading.js"></script>
+    <script src="src/journey/loading.js"></script>
     <div id="journey-loader" role="status" aria-label="Loading scene" hidden>
       <div class="loader-panel loader-left"></div>
       <div class="loader-panel loader-right"></div>
@@ -37,8 +63,8 @@
       <section id="top" class="chapter" aria-label="Welcome">
         <div class="stage welcome">
           <div id="welcome-copy">
-            <h1>Welcome</h1>
-            <p>SCROLL DOWN</p>
+            <h1>Welcome<span class="welcome-glow" aria-hidden="true" data-label="Welcome"></span></h1>
+            <p>SCROLL DOWN<span class="welcome-glow" aria-hidden="true" data-label="SCROLL DOWN"></span></p>
           </div>
         </div>
       </section>
@@ -122,6 +148,7 @@
     <div
       id="object-controls"
       class="object-controls"
+      role="group"
       aria-label="3D objects"
     ></div>
     <p id="interaction-status" class="sr-only" role="status"></p>

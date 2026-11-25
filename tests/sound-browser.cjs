@@ -1,5 +1,6 @@
 const { chromium } = require("playwright"),
   assert = require("node:assert/strict");
+const baseURL = process.env.TEST_BASE_URL || "http://localhost:8080";
 (async () => {
   const b = await chromium.launch({ args: ["--enable-unsafe-swiftshader"] });
   try {
@@ -17,7 +18,7 @@ const { chromium } = require("playwright"),
         }
       };
     });
-    await p.goto("http://localhost:8080/forest-preview.html");
+    await p.goto(`${baseURL}/forest-preview.html`);
     await p.waitForSelector("body[data-ready=true]");
     assert(await p.locator(".sound-controls").evaluate((e) => e.hidden));
     await p.click("#explore-button");
@@ -81,11 +82,11 @@ const { chromium } = require("playwright"),
       0,
     );
     assert.match(await p.locator(".world-notice").textContent(), /Yum/);
-    await aim([1.6, 1.4, 2.8], [1.6, 0.7, 1.31]); // Directly click the laptop at the center of the view.
-    await p.waitForTimeout(500);
+    // The world action returns after the eating animation finishes.
+    await aim([1.6, 1.4, 2.8], [1.6, 0.7, 1.31]);
+    await p.locator("[data-action=laptop]").waitFor();
     await p.mouse.click(600, 425);
-    await p.getByRole("button", { name: "Résumé", exact: true }).click();
-    await p.waitForSelector("dialog[open] iframe");
+    await p.locator("dialog[open] .laptop-code").waitFor();
     assert.match(await p.locator("dialog h2").textContent(), /laptop/);
     await p.click(".dialog-close");
     await aim([6.4, 2.3, -4.5], [7.65, 1.29, -4.7]);
@@ -103,7 +104,7 @@ const { chromium } = require("playwright"),
     await aim([5.8, 2.3, -5.1], [4.7, 2.61, -7.1]);
     await p.locator("[data-action=calendar]").click();
     await p.getByRole("button", { name: "winter", exact: true }).click();
-    await p.waitForTimeout(3400);
+    await p.locator(".world-changing").waitFor({ state: "hidden" });
     await aim([5.8, 2.3, -5.1], [4.7, 2.61, -7.1]);
     await p.locator("[data-action=calendar]").click();
     await p
@@ -119,6 +120,7 @@ const { chromium } = require("playwright"),
       await p.evaluate(() => forestDebug.world.userData.season),
       expected,
     );
+    await p.locator(".world-changing").waitFor({ state: "hidden" });
     await p.keyboard.press("Escape");
     await p.waitForFunction(() => audioTestContext.state === "suspended");
     assert(await p.locator(".sound-controls").evaluate((e) => e.hidden));

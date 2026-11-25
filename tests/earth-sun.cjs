@@ -11,7 +11,7 @@ const assert = require("node:assert/strict");
     });
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.route("**/scene.js", async (route) => {
+    await page.route("**/src/journey/scene.js", async (route) => {
       const response = await route.fetch();
       let body = await response.text();
       body = body.replace(

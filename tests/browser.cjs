@@ -8,7 +8,7 @@ async function run() {
   try {
     const page = await browser.newPage({
         viewport: { width: 1440, height: 900 },
-        reducedMotion: "reduce",
+        reducedMotion: "no-preference",
       }),
       errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
@@ -27,32 +27,90 @@ async function run() {
       "Welcome\n\nSCROLL DOWN",
     );
     assert.equal(await page.locator("#portfolio-link").isVisible(), false);
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    const pulseState = () =>
-      page.locator(".welcome h1, .welcome p").evaluateAll((elements) =>
-        elements.map((e) => {
-          const s = getComputedStyle(e);
+    await page.mouse.move(520, 320);
+    await page.evaluate(() => {
+      window.wheelPositions = [];
+      window.addEventListener("wheel", () => {
+        const started = performance.now();
+        const sample = (now) => {
+          window.wheelPositions.push(scrollY);
+          if (now - started < 500) requestAnimationFrame(sample);
+        };
+        requestAnimationFrame(sample);
+      }, { once: true, passive: true });
+    });
+    await page.mouse.wheel(0, 120);
+    await page.waitForFunction(() => scrollY === 120);
+    const positions = await page.evaluate(() => window.wheelPositions);
+    assert(new Set(positions.filter((y) => y > 0 && y < 120)).size >= 4,
+      "A single mouse-wheel notch moves through intermediate scroll positions");
+
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+    await page.mouse.wheel(0, 120);
+    await page.waitForFunction(() => scrollY > 5);
+    await page.mouse.wheel(0, 120);
+    await page.waitForFunction(() => scrollY === 240);
+    await page.mouse.wheel(0, 120);
+    await page.waitForFunction(() => scrollY > 245);
+    await page.mouse.wheel(0, -120);
+    await page.waitForFunction(() => scrollY < 240);
+
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+    await page.mouse.wheel(0, 640);
+    await page.waitForFunction(() => scrollY === Math.round(innerHeight * 0.18));
+    assert.equal(await page.evaluate(() => scrollY), 162,
+      "One accelerated wheel event is bounded to part of the viewport");
+
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+    await page.mouse.wheel(2, 24);
+    await page.waitForFunction(() => scrollY > 0);
+    await page.mouse.wheel(1, 70);
+    await page.waitForFunction(() => scrollY === 94);
+
+    assert(await page.evaluate(() => {
+      const dispatch = (deltaY, extra) => window.dispatchEvent(
+        new WheelEvent("wheel", { deltaY, cancelable: true, ...extra }),
+      );
+      return !dispatch(5.5) && !dispatch(85) && dispatch(120, { ctrlKey: true });
+    }), "Fine wheel bursts share the animated scroll path while pinch zoom stays native");
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+    await page.keyboard.down("ArrowDown");
+    await page.waitForFunction(() => scrollY > 100);
+    const firstScroll = await page.evaluate(() => scrollY);
+    await page.waitForFunction((start) => scrollY > start + 100, firstScroll);
+    await page.keyboard.up("ArrowDown");
+    const releasedScroll = await page.evaluate(() => scrollY);
+    await page.waitForTimeout(150);
+    assert.equal(await page.evaluate(() => scrollY), releasedScroll);
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+    const pulseState = (phase) =>
+      page.locator(".welcome h1, .welcome p").evaluateAll((elements, phase) => {
+        return elements.map((e) => {
+          const style = getComputedStyle(e);
+          const glow = e.querySelector(".welcome-glow");
+          const [animation] = glow.getAnimations();
+          animation.pause();
+          animation.currentTime = phase * animation.effect.getTiming().duration;
           return {
-            shadow: s.textShadow,
-            opacity: s.opacity,
-            transform: s.transform,
-            animation: s.animationName,
+            shadow: style.textShadow,
+            opacity: style.opacity,
+            transform: style.transform,
+            glowOpacity: Number(getComputedStyle(glow).opacity),
           };
-        }),
-      );
-    const pulseBefore = await pulseState();
-    await page.waitForTimeout(500);
-    const pulseAfter = await pulseState();
+        });
+      }, phase);
+    const pulseBefore = await pulseState(0);
+    const pulseAfter = await pulseState(0.5);
     for (let i = 0; i < 2; i++) {
-      assert.equal(
-        pulseBefore[i].animation,
-        i === 0 ? "welcome-pulse" : "scroll-glow",
-      );
       assert.equal(pulseBefore[i].opacity, pulseAfter[i].opacity);
       assert.equal(pulseBefore[i].transform, pulseAfter[i].transform);
-      assert.notEqual(pulseBefore[i].shadow, pulseAfter[i].shadow);
+      assert.equal(pulseBefore[i].shadow, pulseAfter[i].shadow);
+      assert(pulseAfter[i].glowOpacity > pulseBefore[i].glowOpacity);
     }
     await page.emulateMedia({ reducedMotion: "reduce" });
+    assert(await page.evaluate(() => window.dispatchEvent(
+      new WheelEvent("wheel", { deltaY: 120, cancelable: true }),
+    )), "Reduced motion keeps native wheel handling");
 
     const jump = async (phase) => {
       await page.evaluate((phase) => {
@@ -97,11 +155,12 @@ async function run() {
       await page.locator("#scene").getAttribute("data-moon"),
       "false",
     );
-    const beforeClick = await page.locator("canvas").screenshot();
+    const spaceCanvas = page.locator("#scene canvas");
+    const beforeClick = await spaceCanvas.screenshot();
     await page.mouse.click(720, 450);
     await page.waitForTimeout(200);
     assert.ok(
-      beforeClick.equals(await page.locator("canvas").screenshot()),
+      beforeClick.equals(await spaceCanvas.screenshot()),
       "Object clicks do nothing",
     );
     assert.equal(await page.locator("#interaction-status").textContent(), "");
@@ -191,7 +250,7 @@ async function run() {
     for (const width of [390, 320, 1440]) {
       await page.setViewportSize({ width, height: 844 });
       await page.waitForTimeout(450);
-      for (const phase of [1.95, 2.65, 4.32, 5.99]) {
+      for (const phase of [1.95, 2.65, 3.72, 4.32, 5.99]) {
         await jump(phase);
         if (phase === 2.65) {
           const box = await page.locator("#earth-copy").boundingBox();
@@ -199,6 +258,14 @@ async function run() {
             box.y >= 0 && box.y + box.height <= 844,
             "Earth copy stays in the viewport",
           );
+        }
+        if (phase === 3.72 && width <= 390) {
+          const gutters = await page.locator("#pixel-copy").evaluate((copy) => {
+            const { left, right } = copy.getBoundingClientRect();
+            return [left, innerWidth - right];
+          });
+          assert(gutters.every((gutter) => gutter >= 24),
+            "The pixel-world caption has breathing room on both sides");
         }
         assert.equal(
           await page.evaluate(
@@ -213,10 +280,10 @@ async function run() {
     await page.waitForTimeout(600);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.waitForTimeout(500);
-    const still = await page.locator("canvas").screenshot();
+    const still = await spaceCanvas.screenshot();
     await page.waitForTimeout(400);
     assert.ok(
-      still.equals(await page.locator("canvas").screenshot()),
+      still.equals(await spaceCanvas.screenshot()),
       "Pause freezes orbit and idle motion",
     );
     assert.deepEqual(errors, []);

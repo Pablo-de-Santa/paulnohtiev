@@ -15,8 +15,8 @@ const assert = require("node:assert/strict");
     );
     const values = await page.evaluate(async () => {
       const THREE = await import("/vendor/three.module.min.js"),
-        { createPlanet } = await import("/models.js"),
-        { moonPose } = await import("/choreography.js");
+        { createPlanet } = await import("/src/journey/models.js"),
+        { moonPose } = await import("/src/journey/choreography.js");
       const scene = new THREE.Scene();
       scene.background = new THREE.Color("#ff00ff");
       const camera = new THREE.PerspectiveCamera(42, 2, 0.01, 100);

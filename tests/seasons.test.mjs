@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { seasonForDate } from "../seasons.js";
+import { seasonForDate } from "../src/clearing/seasons.js";
 test("calendar uses local northern-hemisphere seasons across every month", () => {
   const expected = [
     "winter",

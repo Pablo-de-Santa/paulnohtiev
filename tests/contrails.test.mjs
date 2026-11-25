@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "../vendor/three.module.min.js";
-import { createDescentEffects } from "../descent-effects.js";
-import { flightPaths, aircraftPose, engineOutlets } from "../choreography.js";
+import { createDescentEffects } from "../src/journey/descent-effects.js";
+import { flightPaths, aircraftPose, engineOutlets } from "../src/journey/choreography.js";
 test("contrails start at each engine and extend directly opposite aircraft heading", () => {
   const effect = createDescentEffects(null);
   for (const phase of [4.04, 4.15, 4.25, 4.4]) {

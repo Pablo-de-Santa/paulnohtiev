@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { canWalkAt } from "../explore-controls.js";
+import { canWalkAt } from "../src/clearing/explore-controls.js";
 test("walking stays in the clearing and outside pond, cabin walls, fire and trunks", () => {
   assert(canWalkAt(0, 7));
   assert(!canWalkAt(12, 7));

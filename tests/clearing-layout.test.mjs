@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { odiePose, pondContains, pathPoint } from "../clearing-layout.js";
+import { odiePose, pondContains, pathPoint } from "../src/clearing/clearing-layout.js";
 test("entire Odie loop, including body clearance, stays on land and away from fire", () => {
   for (let t = 0; t < 30; t += 0.01) {
     const p = odiePose(t);
