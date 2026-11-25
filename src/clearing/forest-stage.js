@@ -1,17 +1,16 @@
 import {
-  createClearingLife,
+  createClearingEnvironment,
   fadeWorld,
   daylightAt,
   localHour,
-} from "./clearing-life.js";
+} from "./clearing-environment.js";
 import { createClearingTilt } from "./clearing-tilt.js";
 import * as THREE from "../../vendor/three.module.min.js";
 import { createSeasonalScene, prepareSeasonalScene } from "./seasonal-scene.js";
 import { seasonForDate } from "./seasons.js";
-import { createExploreControls } from "./explore-controls.js";
 import { nextFrame, yieldToBrowser } from "../shared/frame-tasks.js";
 
-export async function createForestStage(button) {
+export async function createForestStage(button, { deferExploration = false } = {}) {
   let world = await prepareSeasonalScene(seasonForDate());
   await yieldToBrowser();
   let renderer;
@@ -68,24 +67,7 @@ export async function createForestStage(button) {
     hemi.color.set(0xdceaff);
     sun.color.set(0xffe8d0);
   }
-  await yieldToBrowser();
-  const exploration = createExploreControls({
-    canvas: renderer.domElement,
-    button,
-    getObservationCamera: () => camera,
-    getDoorAngle: () => world.userData.cabin.userData.doorAngle,
-    onBoundary: () => life.notifyBoundary(),
-    getDoorOpen: () => world.userData.cabin.userData.doorOpen,
-    onChange: (active) => life.setExploring(active),
-    getTrees: () => [
-      ...world.userData.treeObstacles,
-      {
-        x: world.userData.dog.position.x,
-        z: world.userData.dog.position.z,
-        radius: 0.48,
-      },
-    ],
-  });
+  const environment = createClearingEnvironment({ scene, sun, hemi });
   function setSeason(value) {
     selectedSeason = value;
     if (fading) {
@@ -110,17 +92,14 @@ export async function createForestStage(button) {
     fadeWorld(world, 0);
     scene.add(world);
   }
-  const life = createClearingLife({
-    scene,
-    sun,
-    hemi,
-    exploration,
-    getWorld: () => world,
-    setSeason,
-  });
+  let exploration = null;
+  let life = null;
+  let explorationPreparation = null;
+  let compiling = null;
   let phase = -1,
     disposed = false,
     preparing = false,
+    hasDrawn = false,
     last = performance.now(),
     elapsed = 0,
     raf;
@@ -128,7 +107,7 @@ export async function createForestStage(button) {
   const tilt = createClearingTilt(
     () =>
       phase >= 5.8 &&
-      !exploration.active &&
+      !exploration?.active &&
       !reducedMotion.matches,
   );
   let width = 0,
@@ -150,7 +129,78 @@ export async function createForestStage(button) {
       Math.round(innerHeight / scale),
       false,
     );
-    exploration.resize();
+    exploration?.resize();
+  }
+  function prepareExploration(onProgress = () => {}) {
+    if (disposed) return Promise.resolve(false);
+    if (explorationPreparation) return explorationPreparation;
+    if (life) {
+      onProgress(1);
+      return Promise.resolve(true);
+    }
+    explorationPreparation = (async () => {
+      onProgress(0);
+      await yieldToBrowser();
+      const [{ createExploreControls }, { createClearingLife }] = await Promise.all([
+        import("./explore-controls.js"),
+        import("./clearing-life.js"),
+      ]);
+      if (disposed) return false;
+      onProgress(0.5);
+      await yieldToBrowser();
+      if (disposed) return false;
+      exploration = createExploreControls({
+        canvas: renderer.domElement,
+        button,
+        bindButton: !deferExploration,
+        getObservationCamera: () => camera,
+        getDoorAngle: () => world.userData.cabin.userData.doorAngle,
+        onBoundary: () => life?.notifyBoundary(),
+        getDoorOpen: () => world.userData.cabin.userData.doorOpen,
+        onChange: (active) => life?.setExploring(active),
+        getTrees: () => [
+          ...world.userData.treeObstacles,
+          {
+            x: world.userData.dog.position.x,
+            z: world.userData.dog.position.z,
+            radius: 0.48,
+          },
+        ],
+      });
+      life = createClearingLife({
+        scene,
+        environment,
+        exploration,
+        getWorld: () => world,
+        setSeason,
+      });
+      life.setVisible(phase >= 5.7);
+      if (deferExploration) {
+        onProgress(0.75);
+        await nextFrame();
+        if (disposed) return false;
+        // Compile against the exploration camera while the panorama keeps drawing.
+        compiling = renderer.compileAsync(scene, exploration.camera);
+        try {
+          await compiling;
+        } finally {
+          compiling = null;
+        }
+      }
+      if (disposed) return false;
+      onProgress(1);
+      return true;
+    })().catch((error) => {
+      if (!disposed) {
+        exploration?.dispose();
+        life?.dispose();
+        exploration = life = null;
+      }
+      throw error;
+    }).finally(() => {
+      explorationPreparation = null;
+    });
+    return explorationPreparation;
   }
   function scheduleFrame() {
     if (
@@ -176,7 +226,7 @@ export async function createForestStage(button) {
     }
     if (!reducedMotion.matches) elapsed += dt;
     const descent = 1 - THREE.MathUtils.smoothstep(phase, 5.05, 5.8);
-    if (!exploration.active) {
+    if (!exploration?.active) {
       const shift = tilt.update(dt);
       camera.position.set(
         12 + shift.x * 3.2,
@@ -185,12 +235,13 @@ export async function createForestStage(button) {
       );
       camera.lookAt(1 + shift.x * 0.5, 1.5 + descent * 30 + shift.y * 0.35, 0);
     }
-    exploration.update(dt);
-    world.userData.visitorPosition = exploration.active
+    exploration?.update(dt);
+    world.userData.visitorPosition = exploration?.active
       ? exploration.camera.position
       : null;
-    life.update(dt, elapsed);
-    if (life.arcadeActive) return;
+    if (life) life.update(dt, elapsed);
+    else environment.update(world, dt, elapsed);
+    if (life?.arcadeActive) return;
     world.userData.update(elapsed, dt);
     if (fading) {
       fadeAge += dt;
@@ -204,19 +255,30 @@ export async function createForestStage(button) {
         fading = null;
       }
     }
-    if (!warming)
-      renderer.render(scene, exploration.active ? exploration.camera : camera);
+    if (!warming) {
+      renderer.render(scene, exploration?.active ? exploration.camera : camera);
+      if (!hasDrawn) {
+        hasDrawn = true;
+        host.style.visibility = "visible";
+      }
+    }
   }
   resize();
   document.addEventListener("visibilitychange", scheduleFrame);
-  return {
+  const stage = {
     resize,
-    async warmup() {
+    prepareExploration,
+    enterExploration() {
+      if (disposed || explorationPreparation || !life || phase < 5.7) return false;
+      exploration.enter();
+      return exploration.active;
+    },
+    async warmup({ compileAll = true } = {}) {
       preparing = true;
       phase = 6;
       try {
         render(performance.now(), true);
-        await renderer.compileAsync(scene, camera);
+        if (compileAll) await renderer.compileAsync(scene, camera);
         const size = renderer.getSize(new THREE.Vector2());
         const shadowSize = sun.shadow.mapSize.clone();
         try {
@@ -241,29 +303,46 @@ export async function createForestStage(button) {
     setPhase(p) {
       if (phase === p) return;
       phase = p;
-      life.setVisible(p >= 5.7);
+      life?.setVisible(p >= 5.7);
       const opacity = THREE.MathUtils.smoothstep(p, 4.94, 5.2);
       const alpha = String(opacity);
-      const visibility = opacity > 0 ? "visible" : "hidden";
+      const visibility = opacity > 0 && hasDrawn ? "visible" : "hidden";
       if (host.style.opacity !== alpha) host.style.opacity = alpha;
       if (host.style.visibility !== visibility) host.style.visibility = visibility;
-      if (p < 5.7 && exploration.active) exploration.exit({ immediate: true });
+      if (p < 5.7 && exploration?.active) exploration.exit({ immediate: true });
       const label = p.toFixed(3);
       if (host.dataset.phase !== label) host.dataset.phase = label;
       scheduleFrame();
     },
     dispose() {
+      if (disposed) return;
       disposed = true;
       cancelAnimationFrame(raf);
       document.removeEventListener("visibilitychange", scheduleFrame);
       tilt.dispose();
-      life.dispose();
-      if (fading) fading.userData.dispose();
-      exploration.dispose();
-      world.userData.dispose();
-      sun.shadow.dispose();
-      renderer.dispose();
       host.remove();
+      exploration?.dispose();
+      const release = () => {
+        life?.dispose();
+        environment.dispose();
+        if (fading) fading.userData.dispose();
+        world.userData.dispose();
+        sun.shadow.dispose();
+        renderer.dispose();
+      };
+      // The renderer still owns the program handles used by in-flight compilation.
+      if (compiling) void compiling.then(release, release);
+      else release();
     },
   };
+  try {
+    if (deferExploration) {
+      // Prime only the seated view here. Walking view shaders are prepared on Explore.
+      await stage.warmup({ compileAll: false });
+    } else await prepareExploration();
+  } catch (error) {
+    stage.dispose();
+    throw error;
+  }
+  return stage;
 }

@@ -2,23 +2,14 @@ import { interview, guide, campGreeting, paulBallReactions } from "./camp-dialog
 import { odieCommands } from "./odie-actions.js";
 import { createCampPreview } from "./camp-preview.js";
 import { isInsideCabin } from "./cabin.js";
-import { createClearingSky } from "./clearing-sky.js";
+import { createClearingEnvironment } from "./clearing-environment.js";
 import { createClearingAudio } from "./clearing-audio.js";
 import { createOdieFetch } from "./odie-fetch.js";
 import { createFetchControls } from "./fetch-controls.js";
+import { compactExploreQuery } from "./explore-controls.js";
 import * as THREE from "../../vendor/three.module.min.js";
-export function localHour(date = new Date()) {
-  return Number.isFinite(date.getTime())
-    ? date.getHours() + date.getMinutes() / 60 + date.getSeconds() / 3600
-    : 12;
-}
-export function daylightAt(hour) {
-  return THREE.MathUtils.smoothstep(
-    Math.sin(((hour - 6) / 24) * Math.PI * 2),
-    -0.16,
-    0.65,
-  );
-}
+export { daylightAt, fadeWorld, localHour } from "./clearing-environment.js";
+
 export function createClearingLife({
   scene,
   sun,
@@ -26,9 +17,11 @@ export function createClearingLife({
   exploration,
   getWorld,
   setSeason,
+  environment,
 }) {
   const audio = createClearingAudio();
-  const skyWorld = createClearingSky(scene);
+  const ownsEnvironment = !environment;
+  environment ??= createClearingEnvironment({ scene, sun, hemi });
   const sweetBite = new THREE.Mesh(
     new THREE.CapsuleGeometry(0.055, 0.06, 4, 8),
     new THREE.MeshStandardMaterial({
@@ -132,9 +125,7 @@ export function createClearingLife({
     visible = true,
     pointerStart = null,
     lastItems = [];
-  let timeOverride = null,
-    hour = localHour(),
-    elapsed = 0,
+  let elapsed = 0,
     nearest = null,
     dialogKind = null,
     focus = null,
@@ -153,9 +144,11 @@ export function createClearingLife({
   document.body.append(dialog);
   const abort = new AbortController(),
     opts = { signal: abort.signal };
+  const hideKeyboardHints = matchMedia(`(pointer: coarse), ${compactExploreQuery}`);
   function notify(text) {
     actionAt = performance.now() / 1000;
     notice.textContent = text;
+    if (text) exploration.showHud();
   }
   function canUseBall() {
     return (
@@ -169,9 +162,12 @@ export function createClearingLife({
   const fetchControls = createFetchControls({
     ui,
     canvas: exploration.canvas,
+    camera: exploration.camera,
     fetch: odieFetch,
     canUse: canUseBall,
     syncLook: exploration.syncLook,
+    hideKeyboardHints,
+    onCancel: () => notify("Throw canceled."),
     signal: abort.signal,
   });
   function close() {
@@ -319,7 +315,7 @@ export function createClearingLife({
           choice("Back", home);
         });
         choice("What can I do here?", () =>
-          say(campGreeting(hour, getWorld().userData.season, greetingIndex++)),
+          say(campGreeting(environment.hour, getWorld().userData.season, greetingIndex++)),
         );
       }
       function section(name, questions) {
@@ -375,10 +371,7 @@ export function createClearingLife({
         const b = document.createElement("button");
         b.textContent = name;
         b.onclick = () => {
-          changing("time", () => {
-            timeOverride =
-              h === null ? null : { hour: h, at: performance.now() };
-          });
+          changing("time", () => environment.setHour(h));
         };
         content.append(b);
       }
@@ -722,12 +715,6 @@ buildSomethingUnique();</pre><p>My résumé and links are on the computer inside
   window.addEventListener("pointercancel", (e) => {
     if (pointerStart?.id === e.pointerId) pointerStart = null;
   }, opts);
-  const sky = new THREE.Color(),
-    daySky = new THREE.Color(),
-    warm = new THREE.Color(),
-    daylightTint = new THREE.Color(0xffe4bd),
-    moonlightTint = new THREE.Color(0xaac7ed),
-    night = new THREE.Color(0x111e37);
   const viewDirection = new THREE.Vector3();
   const speechPoint = new THREE.Vector3();
   return {
@@ -842,7 +829,7 @@ buildSomethingUnique();</pre><p>My résumé and links are on the computer inside
         Math.hypot(player.x - 1.5, player.z + 0.6) < 5 &&
         !isInsideCabin(player)
       ) {
-        say(campGreeting(hour, world.userData.season, greetingIndex++));
+        say(campGreeting(environment.hour, world.userData.season, greetingIndex++));
         nextGreeting = t + 50;
       }
       if (roastReadyAt !== null && nearRoast(player) && t > roastSoundAt) {
@@ -940,29 +927,8 @@ buildSomethingUnique();</pre><p>My résumé and links are on the computer inside
       }
 
       if (!exploration.active && dialogKind) close();
-      const target = timeOverride
-        ? (timeOverride.hour +
-            (performance.now() - timeOverride.at) / 3600000) %
-          24
-        : localHour();
-      const delta = ((target - hour + 36) % 24) - 12;
-      hour = (hour + delta * (1 - Math.exp(-dt * 0.75)) + 24) % 24;
-      const light = daylightAt(hour),
-        dusk = 1 - Math.min(1, Math.abs(light - 0.45) * 2);
-      sky.copy(night).lerp(daySky.set(world.userData.palette.sky), light);
-      scene.background.lerp(sky, 1 - Math.exp(-dt * 0.8));
-      scene.fog.color.copy(scene.background);
-      hemi.intensity = 0.25 + light * 1.85;
-      sun.intensity = 0.32 + light * 3.1;
-      warm.set(0xffbe88).lerp(daylightTint, 1 - dusk);
-      sun.color.copy(warm).lerp(moonlightTint, 1 - light);
-      sun.position.set(
-        Math.cos(((hour - 6) / 24) * Math.PI * 2) * 22,
-        9 + light * 20,
-        10,
-      );
-      skyWorld.update(t, light, sun.position);
-      world.userData.daylight = light;
+      const delta = environment.update(world, dt, t);
+      const hour = environment.hour;
       if (transition) {
         transition.age += dt;
         if (
@@ -974,7 +940,6 @@ buildSomethingUnique();</pre><p>My résumé and links are on the computer inside
           exploration.setLocked(false);
         }
       }
-      world.userData.cabin.userData.update(dt, hour);
       world.userData.exploring =
         exploration.active && !exploration.transitioning;
       const time =
@@ -1194,7 +1159,7 @@ buildSomethingUnique();</pre><p>My résumé and links are on the computer inside
       const actionHidden = !nearest;
       if (button.hidden !== actionHidden) button.hidden = actionHidden;
       if (nearest) {
-        const label = nearest.label + " · E";
+        const label = hideKeyboardHints.matches ? nearest.label : nearest.label + " · E";
         if (button.textContent !== label) button.textContent = label;
         if (button.dataset.action !== nearest.id) button.dataset.action = nearest.id;
       }
@@ -1207,7 +1172,7 @@ buildSomethingUnique();</pre><p>My résumé and links are on the computer inside
       changeOverlay.remove();
       if (dialogKind === "arcade") close();
       audio.dispose();
-      skyWorld.dispose();
+      if (ownsEnvironment) environment.dispose();
       snack.removeFromParent();
       hand.geometry.dispose();
       hand.material.dispose();
@@ -1219,29 +1184,4 @@ buildSomethingUnique();</pre><p>My résumé and links are on the computer inside
       dialog.remove();
     },
   };
-}
-// Materials crossfade while both seasonal scenes coexist, then old resources are released.
-export function fadeWorld(world, amount) {
-  const seen = new Set();
-  world.traverse((o) => {
-    if (o.isLight) {
-      if (o.userData.baseIntensity === undefined)
-        o.userData.baseIntensity = o.intensity;
-      o.intensity = o.userData.baseIntensity * amount;
-    }
-    for (const m of o.material
-      ? Array.isArray(o.material)
-        ? o.material
-        : [o.material]
-      : []) {
-      if (seen.has(m)) continue;
-      seen.add(m);
-      if (m.userData.baseOpacity === undefined) {
-        m.userData.baseOpacity = m.opacity;
-        m.userData.baseTransparent = m.transparent;
-      }
-      m.transparent = amount < 1 || m.userData.baseTransparent;
-      m.opacity = m.userData.baseOpacity * amount;
-    }
-  });
 }

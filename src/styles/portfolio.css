@@ -96,7 +96,6 @@ button:focus-visible {
   letter-spacing: 2px;
   margin: 0;
   text-shadow: 0 0 3px #ffffff55;
-  transition: opacity 0.38s ease-out;
 }
 .copy {
   max-width: 540px;
@@ -323,6 +322,29 @@ button:focus-visible {
   margin: 0;
 }
 
+.journey-pending #earth-copy {
+  position: relative;
+  inset: auto;
+  transform: none;
+}
+
+#explore-button[aria-busy="true"] {
+  min-inline-size: 9.5rem;
+  cursor: progress;
+  animation: none;
+  background: linear-gradient(
+    to right,
+    #55774c var(--explore-progress, 0%),
+    #263c36 var(--explore-progress, 0%)
+  );
+}
+
+.explore-load-error {
+  margin: -8px 0 12px;
+  font-size: 12px;
+  text-shadow: 0 1px 4px #000;
+}
+
 #welcome-copy[role="button"] {
   pointer-events: auto;
   cursor: pointer;
@@ -379,9 +401,6 @@ html.journey-loading,
 .journey-loading :is(#scene, #atmosphere-veil) {
   visibility: hidden;
 }
-.journey-loading #welcome-copy > p {
-  opacity: 0;
-}
 /* Keep later chapter copy hidden while the curtain reveals Welcome. */
 .journey-loading :is(#earth-copy, #pixel-copy, #contact-copy) {
   visibility: hidden !important;
@@ -396,8 +415,7 @@ html.journey-loading,
     animation: none;
   }
   .loader-panel,
-  .loader-label,
-  .welcome p {
+  .loader-label {
     transition: none;
   }
 }

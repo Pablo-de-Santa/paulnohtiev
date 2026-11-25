@@ -80,6 +80,7 @@ export async function createWorld(
     disposed = false,
     mobile = innerWidth < 700;
   let obscured = false;
+  let clearingReady = false;
   let blankRendered = false;
   const invalidate = () => {
     dirty = true;
@@ -219,8 +220,7 @@ export async function createWorld(
   resize();
   function render(_time, deltaMs = 16.67, prepareOnly = false) {
     if (disposed || document.hidden) return;
-    // The clearing canvas is fully opaque from this phase onward.
-    const covered = phase >= 5.2;
+    const covered = clearingReady && phase >= 5.2;
     if (covered && obscured) return;
     const dt = Math.min(deltaMs / 1000, 0.05);
     if (!paused) {
@@ -538,7 +538,7 @@ export async function createWorld(
   host.dataset.assetFailures = assets.failures.join(",");
   return {
     resize,
-    async warmup() {
+    async warmup(getPhase = () => 0) {
       const wasPaused = paused;
       const visibility = host.style.visibility;
       gsap.ticker.remove(render);
@@ -577,7 +577,7 @@ export async function createWorld(
           await nextFrame();
         }
       } finally {
-        this.setPhase(0);
+        this.setPhase(getPhase());
         renderer.setDrawingBufferSize(width, height, ratio);
         blankRendered = false;
         dirty = true;
@@ -602,6 +602,11 @@ export async function createWorld(
       if (paused === value) return;
       paused = value;
       interactions.setSuspended(value);
+      invalidate();
+    },
+    setClearingReady(value) {
+      if (clearingReady === value) return;
+      clearingReady = value;
       invalidate();
     },
     dispose() {

@@ -209,7 +209,7 @@ export function createClearingAudio() {
     } else if (ctx.state === "suspended") ctx.resume().catch(() => {});
   }
   soundButton.onclick = () => {
-    if (!enabled) start();
+    if (!enabled || ctx?.state !== "running") start();
     else {
       enabled = false;
       labels();

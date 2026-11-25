@@ -55,7 +55,10 @@ async function retrieveFirstBall(page, tap) {
   await page.getByRole("status").filter({ hasText: "Odie, where’s the ball?" }).waitFor();
   await waitForReturn(page);
   await aim(page, position, await ballPosition(page));
-  await page.getByRole("button", { name: /Pick up ball/ }).click();
+  const pickup = page.getByRole("button", { name: /Pick up ball/ });
+  await pickup.waitFor();
+  assert.equal(await pickup.textContent(), tap ? "Pick up ball" : "Pick up ball · E");
+  await pickup.click();
   await page.getByRole("button", { name: "Throw ball" }).waitFor();
   const dot = await page.locator(".fetch-aim-dot").boundingBox();
   assert(dot);
@@ -180,12 +183,71 @@ async function offerTreat(page) {
     const mobile = await browser.newPage({ ...devices["iPhone 13"], reducedMotion: "reduce" });
     const mobileErrors = await enter(mobile);
     await retrieveFirstBall(mobile, (x, y) => mobile.touchscreen.tap(x, y));
+    const instructions = await mobile.locator(".fetch-instructions").textContent();
+    assert.match(instructions, /Look down and release to cancel/);
+    assert.doesNotMatch(instructions, /\bF\b|double|mouse/i);
+    await aim(mobile, [0, 1.7, 7], [0, 1.7, 0]);
+    await mobile.evaluate(() => {
+      forestDebug.exploration.setLocked(false);
+      forestDebug.exploration.syncLook();
+    });
+    const touch = await mobile.context().newCDPSession(mobile);
+    const cancelCue = mobile.locator(".fetch-cancel");
+    const dragToCancel = cancelCue.getByText("Drag here and release to cancel", { exact: true });
+    const releaseToCancel = cancelCue.getByText("Release to cancel", { exact: true });
+    assert(!(await cancelCue.isVisible()));
+    await touch.send("Input.dispatchTouchEvent", {
+      type: "touchStart", touchPoints: [{ x: 180, y: 280 }],
+    });
+    await mobile.locator(".fetch-power").waitFor();
+    await dragToCancel.waitFor();
+    const glow = await cancelCue.boundingBox();
+    assert.equal(Math.round(glow.y + glow.height), mobile.viewportSize().height);
+    await touch.send("Input.dispatchTouchEvent", {
+      type: "touchMove", touchPoints: [{ x: 180, y: 510 }],
+    });
+    await releaseToCancel.waitFor();
+    await touch.send("Input.dispatchTouchEvent", {
+      type: "touchMove", touchPoints: [{ x: 180, y: 365 }],
+    });
+    await dragToCancel.waitFor();
+    await touch.send("Input.dispatchTouchEvent", {
+      type: "touchMove", touchPoints: [{ x: 180, y: 510 }],
+    });
+    await releaseToCancel.waitFor();
+    await touch.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await mobile.getByRole("status").filter({ hasText: "Throw canceled." }).waitFor();
+    await mobile.locator(".fetch-power").waitFor({ state: "hidden" });
+    assert(await mobile.locator(".fetch-aim-dot").isVisible());
+    assert(!(await cancelCue.isVisible()));
+    await aim(mobile, [0, 1.7, 7], [0, 1.7, 0]);
+    const throwButton = await mobile.getByRole("button", { name: "Throw ball" }).boundingBox();
+    const x = throwButton.x + throwButton.width / 2;
+    const y = throwButton.y + throwButton.height / 2;
+    await touch.send("Input.dispatchTouchEvent", {
+      type: "touchStart", touchPoints: [{ x, y }],
+    });
+    await dragToCancel.waitFor();
+    await touch.send("Input.dispatchTouchEvent", {
+      type: "touchMove", touchPoints: [{ x, y: Math.min(y + 42, mobile.viewportSize().height - 8) }],
+    });
+    await releaseToCancel.waitFor();
+    assert(Math.abs(await mobile.evaluate(() => forestDebug.exploration.camera.rotation.x)) < 0.01);
+    await touch.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await cancelCue.waitFor({ state: "hidden" });
+    assert(await mobile.locator(".fetch-aim-dot").isVisible(), "Releasing over the glow keeps the ball in hand");
+    await aim(mobile, [0, 1.7, 7], [0, 1.7, 0]);
+    await mobile.locator("body.explore-hud-idle").waitFor();
+    await mobile.touchscreen.tap(180, 350);
+    await mobile.locator("body.explore-hud-idle").waitFor({ state: "detached" });
+    await mobile.waitForTimeout(400);
+    assert(await mobile.locator(".fetch-aim-dot").isVisible(), "A wake tap keeps the ball in hand");
     await mobile.touchscreen.tap(180, 350);
     await mobile.touchscreen.tap(180, 350);
     await waitForOdieToSit(mobile);
     assert(await mobile.getByRole("button", { name: "Throw ball" }).isVisible());
     assert.deepEqual(mobileErrors, []);
-    console.log("PASS fetch menu, aim and power, Paul reaction, Odie protection, treat, pickup, drop, touch squeak and terrain");
+    console.log("PASS fetch menu, aim and power, Paul reaction, Odie protection, treat, pickup, drop, mobile instructions, cancel glow, look-down cancel, touch squeak and terrain");
   } finally {
     await browser.close();
   }

@@ -40,6 +40,13 @@ const assert = require("node:assert/strict");
       "Hint stays visible while learning controls",
     );
     await help.waitFor({ state: "hidden", timeout: 3000 });
+    assert.equal(
+      await page.locator(".explore-exit").evaluate((exit) =>
+        getComputedStyle(exit).opacity,
+      ),
+      "1",
+      "Desktop controls stay visible after the help fades",
+    );
     await page.keyboard.down("KeyW");
     await page.waitForTimeout(700);
     await page.keyboard.up("KeyW");
@@ -161,6 +168,14 @@ const assert = require("node:assert/strict");
       await mobile.locator(".explore-help").textContent(),
       /joystick.*look around/,
     );
+    await mobile.waitForFunction(() => {
+      const stick = getComputedStyle(document.querySelector(".explore-stick"));
+      const exit = getComputedStyle(document.querySelector(".explore-exit"));
+      return (
+        stick.opacity === "0" && exit.opacity === "0" &&
+        exit.pointerEvents === "none"
+      );
+    });
     const before = +(await mobile
       .locator("canvas")
       .getAttribute("data-walk-z"));
@@ -170,7 +185,16 @@ const assert = require("node:assert/strict");
       type: "touchStart",
       touchPoints: [{ x: pad.x + 56, y: pad.y + 20 }],
     });
-    await mobile.waitForTimeout(500);
+    await mobile.waitForFunction(() =>
+      getComputedStyle(document.querySelector(".explore-stick")).opacity === "1",
+    );
+    await mobile.waitForTimeout(3100);
+    assert(
+      await mobile.locator("body").evaluate((body) =>
+        !body.classList.contains("explore-hud-idle"),
+      ),
+      "Controls stay visible throughout a held walk gesture",
+    );
     await client.send("Input.dispatchTouchEvent", {
       type: "touchEnd",
       touchPoints: [],
@@ -181,7 +205,7 @@ const assert = require("node:assert/strict");
     await mobile.waitForFunction(
       () => !document.body.classList.contains("exploring"),
     );
-    console.log("PASS mobile joystick and exit");
+    console.log("PASS mobile HUD inactivity, joystick wake and exit");
   } finally {
     await browser.close();
   }

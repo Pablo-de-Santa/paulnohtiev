@@ -1,6 +1,16 @@
 // Independent of the module graph: a failed import must never trap the visitor.
 (() => {
   const root = document.documentElement;
+  if (matchMedia("(max-width: 700px), (pointer: coarse) and (max-height: 600px)").matches) {
+    root.classList.add("journey-pending");
+    window.journeyLoader = {
+      mobile: true,
+      finish() {
+        root.classList.remove("journey-pending");
+      },
+    };
+    return;
+  }
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const previousRestoration = history.scrollRestoration;
   history.scrollRestoration = "manual";

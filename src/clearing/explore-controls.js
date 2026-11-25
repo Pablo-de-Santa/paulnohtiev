@@ -1,5 +1,10 @@
 import { cabinWalkable, cabinFloor, doorPanelBlocks } from "./cabin.js";
 import * as THREE from "../../vendor/three.module.min.js";
+
+export const compactExploreQuery =
+  "(max-width: 600px), (pointer: coarse) and (max-height: 600px)";
+const hudIdleDelay = 3000;
+
 export function canWalkAt(x, z, trees = [], doorOpen = false) {
   if (x < -11 || x > 11 || z < -9 || z > 11) return false;
   if (((x + 7) / 5.8) ** 2 + ((z - 4.5) / 3.8) ** 2 < 1) return false;
@@ -14,6 +19,7 @@ export function canWalkAt(x, z, trees = [], doorOpen = false) {
 export function createExploreControls({
   canvas,
   button,
+  bindButton = true,
   getObservationCamera = () => null,
   getTrees = () => [],
   getDoorAngle = () => null,
@@ -42,6 +48,10 @@ export function createExploreControls({
   const copyInert = new Map();
   const keys = new Set(),
     stick = new THREE.Vector2();
+  const compactScreen = matchMedia(compactExploreQuery);
+  const touchScreen = matchMedia("(pointer: coarse)");
+  const activePointers = new Set();
+  let hudIdleAt = 0;
   const ui = document.createElement("div");
   ui.className = "explore-ui";
   ui.hidden = true;
@@ -59,6 +69,37 @@ export function createExploreControls({
     look = null;
     knob.style.transform = "translate(0px,0px)";
   };
+  function resetHud() {
+    activePointers.clear();
+    hudIdleAt = 0;
+    document.body.classList.remove("explore-hud-idle");
+  }
+  function showHud() {
+    if (!active || returning || !compactScreen.matches) return;
+    if (!hudIdleAt) document.body.classList.remove("explore-hud-idle");
+    hudIdleAt = performance.now() + hudIdleDelay;
+  }
+  function onCompactScreenChange() {
+    resetHud();
+    if (help.hidden) showHud();
+    else showHelp();
+  }
+  function startHudPointer(e) {
+    if (!active || returning || !compactScreen.matches) return;
+    activePointers.add(e.pointerId);
+    showHud();
+  }
+  function endHudPointer(e) {
+    if (activePointers.delete(e.pointerId)) showHud();
+  }
+  function moveHudPointer(e) {
+    if (e.pointerType === "mouse") showHud();
+  }
+  function resetInput() {
+    clean();
+    activePointers.clear();
+    showHud();
+  }
   function finishExit() {
     if (!active) return;
     active = false;
@@ -71,6 +112,7 @@ export function createExploreControls({
     clean();
     ui.hidden = true;
     document.body.classList.remove("exploring");
+    resetHud();
     copyInert.forEach((value, element) => {
       element.inert = value;
     });
@@ -86,11 +128,14 @@ export function createExploreControls({
     savedFocus?.focus({ preventScroll: true });
   }
   function showHelp() {
-    help.textContent = matchMedia("(pointer: coarse)").matches
+    help.textContent = touchScreen.matches
       ? "Drag the left joystick to walk · Drag the scene to look around"
-      : "WASD or arrow keys to move · Drag the scene to look around";
+      : compactScreen.matches
+        ? "Drag the scene to look around"
+        : "WASD or arrow keys to move · Drag the scene to look around";
     help.hidden = false;
     helpUntil = performance.now() + 3000;
+    showHud();
   }
   function exit({ immediate = false } = {}) {
     if (!active) return;
@@ -141,6 +186,7 @@ export function createExploreControls({
     yaw = 0;
     pitch = -0.06;
     clean();
+    showHud();
     const source = getObservationCamera();
     camera.rotation.order = "YXZ";
     camera.rotation.set(pitch, yaw, 0);
@@ -174,9 +220,10 @@ export function createExploreControls({
     onChange(true);
     exitButton.focus({ preventScroll: true });
   }
-  button.addEventListener("click", enter);
+  if (bindButton) button.addEventListener("click", enter);
   exitButton.addEventListener("click", exit);
   function down(e) {
+    showHud();
     if (!active || locked || returning) return;
     if (e.code === "Escape") {
       exit();
@@ -188,7 +235,7 @@ export function createExploreControls({
     }
   }
   function up(e) {
-    keys.delete(e.code);
+    if (keys.delete(e.code)) showHud();
   }
   function startLook(e) {
     if (!active || entry || returning || locked || look || e.button !== 0) return;
@@ -246,8 +293,14 @@ export function createExploreControls({
   const listeners = [
     [window, "keydown", down],
     [window, "keyup", up],
-    [window, "blur", clean],
-    [document, "visibilitychange", clean],
+    [window, "blur", resetInput],
+    [window, "focusin", showHud],
+    [document, "visibilitychange", resetInput],
+    [compactScreen, "change", onCompactScreenChange],
+    [window, "pointerdown", startHudPointer, true],
+    [window, "pointermove", moveHudPointer, true],
+    [window, "pointerup", endHudPointer, true],
+    [window, "pointercancel", endHudPointer, true],
     [canvas, "pointerdown", startLook],
     [canvas, "pointermove", moveLook],
     [canvas, "pointerup", endLook],
@@ -259,7 +312,7 @@ export function createExploreControls({
     [pad, "pointercancel", endStick],
     [pad, "lostpointercapture", endStick],
   ];
-  listeners.forEach(([o, n, f]) => o.addEventListener(n, f));
+  listeners.forEach(([o, n, f, capture]) => o.addEventListener(n, f, capture));
   return {
     canvas,
     camera,
@@ -272,11 +325,14 @@ export function createExploreControls({
     get exiting() {
       return !!returning;
     },
+    enter,
     exit,
+    showHud,
     syncLook,
     setLocked(value) {
       locked = value;
       clean();
+      if (!locked) showHud();
     },
     resize() {
       camera.aspect = innerWidth / innerHeight;
@@ -284,9 +340,19 @@ export function createExploreControls({
     },
     update(dt) {
       if (!active) return;
-      if (helpUntil && performance.now() >= helpUntil) {
-        help.hidden = true;
-        helpUntil = 0;
+      if (helpUntil || hudIdleAt) {
+        const now = performance.now();
+        if (helpUntil && now >= helpUntil) {
+          help.hidden = true;
+          helpUntil = 0;
+        }
+        if (
+          !entry && !returning && hudIdleAt && now >= hudIdleAt &&
+          !keys.size && !activePointers.size
+        ) {
+          hudIdleAt = 0;
+          document.body.classList.add("explore-hud-idle");
+        }
       }
       if (returning) {
         returning.t += dt;
@@ -381,8 +447,8 @@ export function createExploreControls({
     },
     dispose() {
       finishExit();
-      listeners.forEach(([o, n, f]) => o.removeEventListener(n, f));
-      button.removeEventListener("click", enter);
+      listeners.forEach(([o, n, f, capture]) => o.removeEventListener(n, f, capture));
+      if (bindButton) button.removeEventListener("click", enter);
       ui.remove();
     },
   };

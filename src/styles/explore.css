@@ -199,6 +199,12 @@ body.exploring #explore-button {
   color: #f9ecd4;
   text-align: center;
 }
+.fetch-charging .fetch-tools {
+  opacity: 0;
+}
+.fetch-charging .fetch-buttons button {
+  pointer-events: none;
+}
 .fetch-instructions {
   margin: 0 0 8px;
   padding: 7px 12px;
@@ -245,6 +251,67 @@ body.exploring #explore-button {
   border-radius: 50%;
   background: #fff8e6;
   box-shadow: 0 0 0 1px #17231e, 0 1px 4px #111c;
+}
+.fetch-cancel {
+  --cancel-light: #ffb27c9e;
+  --cancel-halo: #eb795056;
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  width: min(100%, 560px);
+  height: clamp(84px, 16dvh, 134px);
+  margin-inline: auto;
+  padding: 0 12px env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 9px;
+  background: radial-gradient(
+    ellipse 54% 106% at 50% 100%,
+    var(--cancel-light),
+    var(--cancel-halo) 48%,
+    transparent 100%
+  );
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  visibility: hidden;
+  opacity: 0;
+}
+.fetch-charging .fetch-cancel {
+  visibility: visible;
+  opacity: 1;
+}
+.fetch-cancel[data-armed] {
+  --cancel-light: #ffd098e6;
+  --cancel-halo: #ec79518c;
+}
+.fetch-cancel-label {
+  padding: 6px 11px;
+  border: 1px solid #d9ac86aa;
+  border-radius: 6px;
+  background: #2c241def;
+  color: #fff2df;
+  font: 600 13px/1.25 system-ui;
+}
+.fetch-cancel[data-armed] .fetch-cancel-label {
+  border-color: #ffcc99;
+  background: #663c26;
+}
+.fetch-cancel::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #ffe1bb;
+  border-bottom: 2px solid #ffe1bb;
+  transform: rotate(45deg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fetch-cancel,
+  .fetch-tools {
+    transition: opacity 150ms ease-out;
+  }
 }
 .fetch-power {
   position: absolute;
@@ -320,6 +387,10 @@ body.exploring #explore-button {
     max-width: calc(100% - 153px);
     transform: none;
   }
+  .fetch-cancel {
+    inset-inline-start: auto;
+    width: min(560px, calc(100% - 142px));
+  }
   .fetch-buttons button {
     min-height: 44px;
   }
@@ -366,6 +437,31 @@ body.exploring #explore-button {
 body.exploring .sound-controls {
   bottom: auto;
   top: 72px;
+}
+@media (max-width: 600px), (pointer: coarse) and (max-height: 600px) {
+  @media (prefers-reduced-motion: no-preference) {
+    body.exploring :is(
+      .explore-exit, .explore-stick, .game-clock, .camp-introduction,
+      .sound-controls, .world-action, .fetch-tools
+    ) {
+      transition: opacity 260ms ease;
+    }
+  }
+
+  body.exploring.explore-hud-idle :is(
+    .explore-exit, .explore-stick, .game-clock, .camp-introduction,
+    .sound-controls, .world-action, .fetch-tools
+  ):not(:focus-visible, :has(:focus-visible)) {
+    opacity: 0;
+  }
+
+  /* Keep the transparent joystick available for the first movement gesture. */
+  body.exploring.explore-hud-idle :is(
+    .explore-exit, .camp-introduction, .sound-controls, .world-action,
+    .fetch-buttons button
+  ):not(:focus-visible, :has(:focus-visible)) {
+    pointer-events: none;
+  }
 }
 @media (max-width: 600px) {
   .world-notice {

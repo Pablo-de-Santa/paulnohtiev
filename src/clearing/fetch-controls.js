@@ -1,9 +1,16 @@
+import { Vector3 } from "../../vendor/three.module.min.js";
+
 const chargeTime = 1100;
 const doubleTapTime = 320;
 const quickTapTime = 180;
+const dragThreshold = 10;
 const minimumPower = 0.08;
+const cancelDown = -Math.sin(50 * Math.PI / 180);
+const resumeUp = -Math.sin(44 * Math.PI / 180);
 
-export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signal }) {
+export function createFetchControls({
+  ui, canvas, camera, fetch, canUse, syncLook, hideKeyboardHints, onCancel, signal,
+}) {
   const tools = document.createElement("div");
   tools.className = "fetch-tools";
   tools.hidden = true;
@@ -17,17 +24,29 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
   const aim = document.createElement("div");
   aim.className = "fetch-aim";
   aim.hidden = true;
-  aim.innerHTML = '<div class="fetch-power" role="progressbar" aria-label="Throw power" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden></div><span class="fetch-aim-dot" aria-hidden="true"></span>';
-  ui.append(tools, aim);
+  aim.innerHTML = `
+    <div class="fetch-power" role="progressbar" aria-label="Throw power" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden></div>
+    <span class="fetch-aim-dot" aria-hidden="true"></span>`;
+  const cancelCue = document.createElement("div");
+  cancelCue.className = "fetch-cancel";
+  cancelCue.setAttribute("role", "status");
+  const cancelLabel = document.createElement("span");
+  cancelLabel.className = "fetch-cancel-label";
+  cancelCue.append(cancelLabel);
+  ui.append(tools, aim, cancelCue);
   const instructions = tools.querySelector(".fetch-instructions");
   const meter = aim.querySelector(".fetch-power");
   const throwButton = tools.querySelector(".fetch-throw");
   const opts = { signal };
-  const touch = matchMedia("(pointer: coarse)");
+  const direction = new Vector3();
   let press = null;
   let tap = null;
   let shown = false;
+  let lookingDown = false;
   let meterPercent = 0;
+  let cancelBounds = null;
+  let cueVisible = false;
+  let cueArmed = false;
 
   const available = () => fetch.held && canUse();
   const powerAt = (ms) => Math.max(minimumPower, Math.min(1, ms / chargeTime));
@@ -39,7 +58,21 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
   function reset() {
     press = null;
     clearTap();
+    lookingDown = false;
+    cancelBounds = null;
+    showCancelCue(false);
     showPower(0);
+  }
+  function showCancelCue(visible, armed = false) {
+    if (cueVisible === visible && cueArmed === armed) return;
+    cueVisible = visible;
+    cueArmed = armed;
+    ui.classList.toggle("fetch-charging", visible);
+    cancelCue.toggleAttribute("data-armed", armed);
+    if (visible) {
+      const direction = press.id === "keyboard" ? "Look down" : "Drag here";
+      cancelLabel.textContent = armed ? "Release to cancel" : `${direction} and release to cancel`;
+    }
   }
   function showPower(percent) {
     if (percent === meterPercent) return;
@@ -53,9 +86,35 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
     reset();
     fetch.squeak();
   }
+  function aimsDown() {
+    lookingDown = camera.getWorldDirection(direction).y <= (lookingDown ? resumeUp : cancelDown);
+    return lookingDown;
+  }
+  function wasDragged(gesture, x, y) {
+    return Math.hypot(x - gesture.x, y - gesture.y) > dragThreshold;
+  }
+  function isOverCancelTarget(gesture, x, y) {
+    if (gesture.id === "keyboard" || !wasDragged(gesture, x, y)) return false;
+    cancelBounds ??= cancelCue.getBoundingClientRect();
+    const { left, right, top, bottom } = cancelBounds;
+    const contains = (x, y) => x >= left && x <= right && y >= top && y <= bottom;
+    // A throw started on a low button can still be aimed sideways.
+    return contains(x, y) && (!contains(gesture.x, gesture.y) || y - gesture.y > dragThreshold);
+  }
+  function cancelThrow() {
+    reset();
+    onCancel();
+  }
+  function cancelIfLookingDown() {
+    if (!aimsDown()) return false;
+    cancelThrow();
+    return true;
+  }
   function throwBall(power) {
     if (!available()) return;
     syncLook();
+    if (cancelIfLookingDown()) return;
+    reset();
     fetch.throwBall(power);
   }
 
@@ -71,7 +130,10 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
     const double = tap && now - tap.at <= doubleTapTime &&
       tap.target === e.currentTarget && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 44;
     clearTap();
-    press = { id: e.pointerId, x: e.clientX, y: e.clientY, at: now, target: e.currentTarget, double, moved: false };
+    press = {
+      id: e.pointerId, x: e.clientX, y: e.clientY, at: now,
+      clientX: e.clientX, clientY: e.clientY, target: e.currentTarget, double, moved: false,
+    };
     if (e.currentTarget === throwButton) throwButton.setPointerCapture(e.pointerId);
   }
   function movePointer(e) {
@@ -80,27 +142,44 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
       squeak();
       return;
     }
-    if (Math.hypot(e.clientX - press.x, e.clientY - press.y) > 10)
-      press.moved = true;
+    press.clientX = e.clientX;
+    press.clientY = e.clientY;
+    press.moved ||= wasDragged(press, e.clientX, e.clientY);
   }
   function releasePointer(e) {
     if (press?.id !== e.pointerId) return;
-    const { at, double, target, moved } = press;
+    const gesture = press;
+    const { at, double, target } = gesture;
+    const moved = gesture.moved || wasDragged(gesture, e.clientX, e.clientY);
     press = null;
-    if (!available()) return;
+    showCancelCue(false);
+    if (!available()) {
+      reset();
+      return;
+    }
+    if (isOverCancelTarget(gesture, e.clientX, e.clientY)) {
+      cancelThrow();
+      return;
+    }
     const now = performance.now();
     const duration = now - at;
-    if (!moved && duration < quickTapTime && double) {
-      squeak();
-    } else if (!moved && duration < quickTapTime) {
-      const timer = setTimeout(() => {
-        tap = null;
-        throwBall(powerAt(duration));
-      }, doubleTapTime);
-      tap = { timer, at: now, x: e.clientX, y: e.clientY, target };
-    } else {
+    if (moved || duration >= quickTapTime) {
       throwBall(powerAt(duration));
+      return;
     }
+    syncLook();
+    if (cancelIfLookingDown()) return;
+    if (double) {
+      squeak();
+      return;
+    }
+    // A short scene tap can bring back compact controls without throwing the ball.
+    const throwsOnTap = target === throwButton || !hideKeyboardHints.matches;
+    const timer = throwsOnTap ? setTimeout(() => {
+      tap = null;
+      throwBall(powerAt(duration));
+    }, doubleTapTime) : null;
+    tap = { timer, at: now, x: e.clientX, y: e.clientY, target };
   }
 
   for (const target of [canvas, throwButton]) {
@@ -123,6 +202,7 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
     if (press?.id === e.pointerId) reset();
   }, opts);
   window.addEventListener("blur", reset, opts);
+  window.addEventListener("resize", () => { cancelBounds = null; }, opts);
   document.addEventListener("visibilitychange", reset, opts);
   signal.addEventListener("abort", reset, { once: true });
   window.addEventListener("keydown", (e) => {
@@ -135,7 +215,6 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
   window.addEventListener("keyup", (e) => {
     if (e.code !== "KeyF" || press?.id !== "keyboard") return;
     const { at } = press;
-    reset();
     throwBall(powerAt(performance.now() - at));
   }, opts);
   throwButton.addEventListener("click", (e) => {
@@ -149,11 +228,10 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
   }, opts);
 
   function updateInstructions() {
-    instructions.textContent = touch.matches
-      ? "Hold to build power. Drag to aim, then release to throw. Double-tap to squeak."
-      : "Hold the mouse button or F to build power. Drag to aim, then release to throw. Right-click or double-click to squeak.";
+    const charge = hideKeyboardHints.matches ? "Hold to build power." : "Hold the mouse button or F to build power.";
+    instructions.textContent = `${charge} Drag to aim and release to throw. Look down and release to cancel.`;
   }
-  touch.addEventListener("change", updateInstructions, opts);
+  hideKeyboardHints.addEventListener("change", updateInstructions, opts);
   updateInstructions();
 
   return {
@@ -169,6 +247,8 @@ export function createFetchControls({ ui, canvas, fetch, canUse, syncLook, signa
       if (!ready) return;
       const duration = press ? performance.now() - press.at : 0;
       showPower(duration < 100 ? 0 : Math.round(powerAt(duration) * 100));
+      const armed = Boolean(press && (aimsDown() || isOverCancelTarget(press, press.clientX, press.clientY)));
+      showCancelCue(Boolean(press && (armed || press.moved || duration >= 100)), armed);
     },
   };
 }
