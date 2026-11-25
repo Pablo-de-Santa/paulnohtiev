@@ -6,9 +6,10 @@ import { attachJourneyWheel } from "./journey-wheel.js";
 const sections = [...document.querySelectorAll(".chapter")],
   media = matchMedia("(prefers-reduced-motion: reduce)");
 const host = document.querySelector("#scene");
+const loader = window.journeyLoader;
 const exploreButton = document.querySelector("#explore-button"),
   exploreError = document.querySelector(".explore-load-error"),
-  mobile = window.journeyLoader?.mobile === true;
+  mobile = loader?.mobile === true;
 const welcome = document.querySelector("#welcome-copy"),
   earthCopy = document.querySelector("#earth-copy"),
   contact = document.querySelector("#contact-copy");
@@ -174,17 +175,15 @@ function dispose() {
 function fallback(error) {
   if (stopped) return;
   console.error("3D scene unavailable", error);
+  if (loader?.fail) {
+    loader.fail();
+    return;
+  }
   dispose();
   exploreButton.disabled = true;
-  window.journeyLoader?.finish(true);
   document.body.classList.add("scene-unavailable");
   document.querySelector("#scene-error").hidden = false;
-  document.querySelector("#atmosphere-veil").style.opacity = 0;
-  [welcome, earthCopy, contact].forEach((e) => {
-    e.style.opacity = 1;
-    e.style.visibility = "visible";
-    e.inert = false;
-  });
+  for (const copy of [welcome, earthCopy, contact]) copy.inert = false;
 }
 function attachScrollInputs() {
   detachKeyboard = attachJourneyKeyboard({ getMaximumScroll: () => end, reducedMotion: media });
@@ -198,28 +197,22 @@ function attachScrollInputs() {
   });
 }
 async function initialize() {
+  if (loader?.failed) return;
   if (!window.gsap || !window.ScrollTrigger)
     throw new Error("Animation libraries did not load");
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.config({ ignoreMobileResize: true });
-  if (mobile) {
-    setupScroll();
-    window.journeyLoader.finish();
-    attachScrollInputs();
-    watchChanges();
-    exploreButton.addEventListener("click", enterMobileClearing, listenerOptions);
-    exploreButton.disabled = false;
-  }
   const { createWorld } = await import("./scene.js");
   if (stopped) return;
   const stage = await createWorld(host, {
     reducedMotion: media.matches,
+    mobileAssets: mobile,
     onFailure: fallback,
   });
   try {
     if (stopped) return;
-    window.journeyLoader?.revealWelcome?.();
-    await stage.warmup(() => currentPhase);
+    if (!mobile) loader?.revealWelcome?.();
+    await stage.warmup();
     if (stopped) return;
     stage.resize();
     world = stage;
@@ -233,15 +226,17 @@ async function initialize() {
     if (stopped) return;
     await preparePanorama();
     if (stopped) return;
-    window.scrollTo(0, 0);
-    setupScroll();
-    exploreButton.disabled = false;
-    await window.journeyLoader?.finish();
-    if (stopped) return;
-    attachScrollInputs();
-    watchChanges();
+  } else {
+    exploreButton.addEventListener("click", enterMobileClearing, listenerOptions);
   }
-  update();
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  setupScroll();
+  exploreButton.disabled = false;
+  host.dataset.renderReady = "true";
+  await loader?.finish();
+  if (stopped) return;
+  attachScrollInputs();
+  watchChanges();
   host.dataset.ready = "true";
 }
 function watchChanges() {
@@ -269,4 +264,5 @@ function watchChanges() {
 window.addEventListener("pagehide", (event) => {
   if (!event.persisted) dispose();
 }, listenerOptions);
+window.addEventListener("journey-load-failed", dispose, listenerOptions);
 initialize().catch(fallback);

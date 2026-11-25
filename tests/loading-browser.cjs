@@ -12,6 +12,16 @@ async function holdRequest(page, pattern) {
   return release;
 }
 
+function trackEarthMaps(page) {
+  const maps = new Set();
+  page.on("request", (request) => {
+    const path = new URL(request.url()).pathname;
+    const match = path.match(/\/assets\/textures\/((?:mobile\/)?[48]k_earth_(?:daymap|nightmap)\.jpg)$/);
+    if (match) maps.add(match[1]);
+  });
+  return maps;
+}
+
 async function swipeUp(page) {
   const input = await page.context().newCDPSession(page);
   const point = (y) => [{ x: 195, y }];
@@ -23,13 +33,42 @@ async function swipeUp(page) {
       type: "touchMove", touchPoints: point(y),
     });
   }
-  await page.waitForFunction(() => scrollY > 100);
-  // Pause at the end of the swipe so momentum does not move the next test position.
+  // Pause at the end so momentum does not move the next test position.
   await page.waitForTimeout(180);
   await input.send("Input.dispatchTouchEvent", {
     type: "touchEnd", touchPoints: [],
   });
   await input.detach();
+}
+
+async function checkSpaceFrame(page) {
+  await page.evaluate(() => {
+    const welcomeHeight = document.querySelector("#afterBang").offsetTop;
+    scrollTo({ top: welcomeHeight * 0.88, behavior: "instant" });
+  });
+  await page.waitForFunction(() => {
+    const scene = document.querySelector("#scene");
+    return Math.abs(Number(scene.dataset.phase) - 0.88) < 0.01 &&
+      scene.dataset.cosmicStage === "expansion";
+  });
+  assert.equal(await page.locator("#welcome-copy").isVisible(), false);
+  const frame = await page.locator("#scene canvas").screenshot({ scale: "css" });
+  const litPixels = await page.evaluate(async (png) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${png}`;
+    await image.decode();
+    const sample = document.createElement("canvas");
+    sample.width = image.naturalWidth;
+    sample.height = image.naturalHeight;
+    const context = sample.getContext("2d");
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
+    let count = 0;
+    for (let i = 0; i < pixels.length; i += 4)
+      if (Math.max(pixels[i], pixels[i + 1], pixels[i + 2]) > 32) count++;
+    return count;
+  }, frame.toString("base64"));
+  assert(litPixels > 100, "The first space chapter draws visible pixels");
 }
 
 async function checkMobile(browser, viewport, reducedMotion) {
@@ -38,6 +77,7 @@ async function checkMobile(browser, viewport, reducedMotion) {
   });
   const errors = [];
   const clearingModules = new Set();
+  const earthMaps = trackEarthMaps(page);
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("request", (request) => {
     const path = new URL(request.url()).pathname;
@@ -52,29 +92,54 @@ async function checkMobile(browser, viewport, reducedMotion) {
     page.waitForRequest(initialPattern),
     page.goto(baseURL, { waitUntil: "domcontentloaded" }),
   ]);
-  await page.locator("#journey-loader").waitFor({ state: "hidden" });
-  assert(await page.locator("#welcome-copy").isVisible());
-  assert.equal(await page.locator("#welcome-copy > p").evaluate(
-    (hint) => getComputedStyle(hint).opacity,
-  ), "1", "Scroll Down is visible while the journey texture is still loading");
+  const loader = page.locator("#journey-loader");
+  await loader.waitFor({ state: "visible" });
+  assert.equal(await loader.evaluate((element) => element.classList.contains("opening")), false);
+  await loader.evaluate((element) => {
+    const observer = new MutationObserver(() => {
+      if (!element.classList.contains("opening")) return;
+      window.mobileOpening = {
+        renderReady: document.querySelector("#scene").dataset.renderReady,
+        locked: document.querySelector("main").inert,
+        scrollY,
+      };
+      observer.disconnect();
+    });
+    observer.observe(element, { attributeFilter: ["class"] });
+  });
   const introInView = await page.locator("#earth-copy").evaluate((copy) => {
     const bounds = copy.getBoundingClientRect();
     return getComputedStyle(copy).visibility === "visible" &&
       bounds.top < innerHeight && bounds.bottom > 0;
   });
   assert(!introInView, "Later chapters stay out of the welcome viewport");
-  assert.equal(await page.locator("main").evaluate((main) => main.inert), false);
+  assert.equal(await page.locator("main").evaluate((main) => main.inert), true);
   await swipeUp(page);
+  assert.equal(await page.evaluate(() => scrollY), 0, "Mobile scrolling stays locked while the texture is pending");
 
-  const position = await page.evaluate(() => {
-    scrollTo({ top: document.querySelector("#about").offsetTop, behavior: "instant" });
-    return scrollY;
-  });
   releaseInitial();
   await page.locator('#scene[data-ready="true"]').waitFor({
     state: "attached", timeout: 120000,
   });
-  assert.equal(await page.evaluate(() => scrollY), position, "The scene respects the scroll position reached while loading");
+  assert.deepEqual(await page.evaluate(() => window.mobileOpening), {
+    renderReady: "true",
+    locked: true,
+    scrollY: 0,
+  }, "The mobile curtain opens after the renderer is ready");
+  await loader.waitFor({ state: "detached" });
+  assert(await page.locator("#welcome-copy").isVisible());
+  assert(await page.getByText("SCROLL DOWN", { exact: true }).isVisible());
+  assert.equal(await page.locator("main").evaluate((main) => main.inert), false);
+  assert.equal(await page.evaluate(() => scrollY), 0, "The curtain hands off to Welcome");
+  assert.deepEqual([...earthMaps].sort(), [
+    "mobile/4k_earth_daymap.jpg",
+    "mobile/4k_earth_nightmap.jpg",
+  ]);
+  assert.doesNotMatch(await page.locator("#scene").getAttribute("data-asset-failures"), /Earth/,
+    "The smaller Earth textures load successfully");
+  await swipeUp(page);
+  await page.waitForFunction(() => scrollY > 100);
+  await checkSpaceFrame(page);
   assert.deepEqual([...clearingModules], [], "The clearing waits for the visitor to approach");
 
   await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
@@ -111,7 +176,7 @@ async function checkMobile(browser, viewport, reducedMotion) {
   assert(progress.every(({ value }, i) => i === 0 || value >= progress[i - 1].value));
   assert.deepEqual(progress.at(-1), { value: 100, text: "Loading 100%" });
   assert.deepEqual(errors, []);
-  console.log(`${viewport.width}px ${reducedMotion}: early touch scrolling, deferred Explore load and 0–100% progress passed`);
+  console.log(`${viewport.width}px ${reducedMotion}: mobile curtain, rendered space, deferred Explore and 0–100% progress passed`);
   await page.close();
 }
 
@@ -130,6 +195,7 @@ async function checkMobile(browser, viewport, reducedMotion) {
         continue;
       }
       const page = await browser.newPage({ viewport, reducedMotion });
+      const earthMaps = trackEarthMaps(page);
       const errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
       await page.addInitScript(() => {
@@ -208,6 +274,10 @@ async function checkMobile(browser, viewport, reducedMotion) {
       assert.equal(await page.locator("#journey-loader").count(), 0);
       assert.equal(await page.locator("main").evaluate((e) => e.inert), false);
       assert.equal(await page.evaluate(() => scrollY), 0);
+      assert.deepEqual([...earthMaps].sort(), [
+        "8k_earth_daymap.jpg",
+        "8k_earth_nightmap.jpg",
+      ]);
       assert.equal(await page.locator("#forest-stage").count(), 1);
       assert(await page.locator("#welcome-copy").isVisible());
       await page.evaluate(() =>
@@ -237,6 +307,21 @@ async function checkMobile(browser, viewport, reducedMotion) {
     assert(await page.locator("#earth-copy").isVisible());
     console.log("Library failure: loader unlocks and fallback visible");
     await page.close();
+    const missingEntry = await browser.newPage({
+      viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true,
+    });
+    await missingEntry.route(/\/src\/journey\/main\.js(?:\?.*)?$/, (route) => route.abort());
+    await missingEntry.goto(baseURL);
+    await missingEntry.waitForSelector("body.scene-unavailable");
+    assert.equal(await missingEntry.locator("#journey-loader").count(), 0);
+    assert.equal(await missingEntry.locator("main").evaluate((main) => main.inert), false);
+    assert(await missingEntry.locator("#earth-copy").isVisible());
+    assert(await missingEntry.getByRole("link", { name: "Here is my Resume" }).isVisible());
+    const fallbackMessage = await missingEntry.locator("#scene-error").boundingBox();
+    assert(fallbackMessage && fallbackMessage.width > 10 && fallbackMessage.height > 10,
+      "Mobile entry failure shows a visible explanation alongside the static portfolio");
+    console.log("Mobile entry failure: visible explanation and static portfolio available");
+    await missingEntry.close();
     const noScripts = await browser.newPage({ javaScriptEnabled: false });
     await noScripts.goto(baseURL);
     assert.equal(await noScripts.locator("#journey-loader").isVisible(), false);

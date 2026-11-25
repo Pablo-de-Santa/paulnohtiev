@@ -29,7 +29,7 @@ import {
 
 export async function createWorld(
   host,
-  { onFailure, onFrame, reducedMotion = false },
+  { onFailure, onFrame, reducedMotion = false, mobileAssets = false },
 ) {
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -41,7 +41,15 @@ export async function createWorld(
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   host.appendChild(renderer.domElement);
-  const [assets, density] = await Promise.all([loadAssets(), prepareNebulaDensity()]);
+  const contextLost = (event) => {
+    event.preventDefault();
+    onFailure(new Error("WebGL context lost"));
+  };
+  renderer.domElement.addEventListener("webglcontextlost", contextLost);
+  const [assets, density] = await Promise.all([
+    loadAssets({ mobile: mobileAssets }),
+    prepareNebulaDensity(),
+  ]);
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#000000");
   const camera = new THREE.PerspectiveCamera(
@@ -182,11 +190,6 @@ export async function createWorld(
     earthTarget = new THREE.Vector3(),
     direction = new THREE.Vector3();
   const parallax = new THREE.Vector2();
-  const contextLost = (event) => {
-    event.preventDefault();
-    onFailure(new Error("WebGL context lost"));
-  };
-  renderer.domElement.addEventListener("webglcontextlost", contextLost);
   let flightPaths;
   let pixelSky = false;
   let width = 0,
@@ -538,7 +541,7 @@ export async function createWorld(
   host.dataset.assetFailures = assets.failures.join(",");
   return {
     resize,
-    async warmup(getPhase = () => 0) {
+    async warmup() {
       const wasPaused = paused;
       const visibility = host.style.visibility;
       gsap.ticker.remove(render);
@@ -577,7 +580,7 @@ export async function createWorld(
           await nextFrame();
         }
       } finally {
-        this.setPhase(getPhase());
+        this.setPhase(0);
         renderer.setDrawingBufferSize(width, height, ratio);
         blankRendered = false;
         dirty = true;
@@ -586,6 +589,8 @@ export async function createWorld(
         paused = wasPaused;
         gsap.ticker.add(render);
       }
+      if (renderer.getContext().isContextLost())
+        throw new Error("WebGL context lost during startup");
     },
     setPhase(value) {
       const nextPixelSky = value >= 3.65;

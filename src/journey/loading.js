@@ -1,21 +1,13 @@
 // Independent of the module graph: a failed import must never trap the visitor.
 (() => {
   const root = document.documentElement;
-  if (matchMedia("(max-width: 700px), (pointer: coarse) and (max-height: 600px)").matches) {
-    root.classList.add("journey-pending");
-    window.journeyLoader = {
-      mobile: true,
-      finish() {
-        root.classList.remove("journey-pending");
-      },
-    };
-    return;
-  }
+  const mobile = matchMedia("(max-width: 700px), (pointer: coarse) and (max-height: 600px)").matches;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const previousRestoration = history.scrollRestoration;
   history.scrollRestoration = "manual";
   root.classList.add("journey-loading");
   let finished = false;
+  let failed = false;
   let curtain;
   const preventScroll = (event) => event.preventDefault();
   const preventKeys = (event) => {
@@ -52,9 +44,32 @@
     }
     return curtain;
   }
+  function showFallback() {
+    document.body.classList.add("scene-unavailable");
+    document.querySelector("#scene-error")?.removeAttribute("hidden");
+    document.querySelector("#explore-button")?.setAttribute("disabled", "");
+    for (const copy of document.querySelectorAll("#welcome-copy, #earth-copy, #contact-copy"))
+      copy.inert = false;
+  }
+  function fail() {
+    if (failed) return;
+    failed = finished = true;
+    clearTimeout(watchdog);
+    document.querySelector("#journey-loader")?.remove();
+    unlock();
+    window.dispatchEvent(new Event("journey-load-failed"));
+    showFallback();
+  }
   window.journeyLoader = {
+    mobile,
+    fail,
+    get failed() {
+      return failed;
+    },
     show() {
-      document.querySelector("#journey-loader").hidden = false;
+      const loader = document.querySelector("#journey-loader");
+      if (finished) loader?.remove();
+      else if (loader) loader.hidden = false;
     },
     revealWelcome() {
       const loader = document.querySelector("#journey-loader");
@@ -65,11 +80,13 @@
       openCurtain(loader);
     },
     async finish(immediate = false) {
+      if (immediate) return fail();
       if (finished) return;
       finished = true;
       clearTimeout(watchdog);
       const loader = document.querySelector("#journey-loader");
-      if (loader && !immediate) await openCurtain(loader);
+      if (loader) await openCurtain(loader);
+      if (failed) return;
       loader?.remove();
       unlock();
     },
@@ -77,17 +94,18 @@
   addEventListener(
     "DOMContentLoaded",
     () => {
-      if (!finished) {
+      if (failed) showFallback();
+      else if (!finished) {
         document.querySelector("main")?.setAttribute("inert", "");
         scrollTo(0, 0);
       }
     },
     { once: true },
   );
-  // Fail open if a script never arrives or the graphics driver stalls.
-  const watchdog = setTimeout(() => window.journeyLoader.finish(true), 60000);
+  // Keep the static portfolio available if the module or graphics driver stalls.
+  const watchdog = setTimeout(fail, 60000);
   addEventListener("error", (event) => {
-    if (event.filename?.endsWith("/journey/main.js"))
-      window.journeyLoader.finish(true);
-  });
+    const entry = document.querySelector("script[data-journey-entry]");
+    if (entry && (event.target === entry || event.filename === entry.src)) fail();
+  }, true);
 })();

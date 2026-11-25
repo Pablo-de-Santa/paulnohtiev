@@ -200,8 +200,20 @@ button:focus-visible {
 .scene-unavailable #contact-copy {
   bottom: 30vh;
 }
-.scene-unavailable #scene {
-  background: #000;
+.scene-unavailable :is(#scene, #atmosphere-veil, #pixel-copy, #explore-button) {
+  display: none;
+}
+.scene-unavailable :is(#welcome-copy, #earth-copy, #contact-copy) {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+#scene-error {
+  max-width: 36ch;
+  margin: 14px auto 0;
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: normal;
+  color: #b9c6d4;
 }
 @media (max-width: 700px) {
   .stage {
@@ -320,12 +332,6 @@ button:focus-visible {
   top: auto;
   transform: none;
   margin: 0;
-}
-
-.journey-pending #earth-copy {
-  position: relative;
-  inset: auto;
-  transform: none;
 }
 
 #explore-button[aria-busy="true"] {

@@ -15,7 +15,12 @@ const textureFiles = {
   Uranus: "2k_uranus",
   Neptune: "2k_neptune",
 };
-export async function loadAssets() {
+const mobileEarthFiles = {
+  Earth: "mobile/4k_earth_daymap",
+  EarthNight: "mobile/4k_earth_nightmap",
+};
+
+export async function loadAssets({ mobile = false } = {}) {
   const textureLoader = new THREE.TextureLoader(),
     modelLoader = new GLTFLoader();
   // Decode blobs without blocking the first WebGL upload on the main thread.
@@ -50,8 +55,9 @@ export async function loadAssets() {
   const jobs = [
     ...Object.entries(textureFiles).map(async ([name, file]) => {
       try {
+        const map = mobile ? mobileEarthFiles[name] ?? file : file;
         const texture = await loadTexture(
-          `assets/textures/${file}.jpg`,
+          `assets/textures/${map}.jpg`,
         );
         texture.colorSpace =
           name === "EarthClouds" ? THREE.NoColorSpace : THREE.SRGBColorSpace;
